@@ -170,7 +170,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   else                  coreS = new G4Box  ("coreS", core_radius, core_radius, 0.5*fibre_length) ;    
   G4LogicalVolume* coreLV = new G4LogicalVolume (coreS, CoMaterial, "coreLV");
   new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), coreLV, "corePV", worldLV, false, 0, checkOverlaps) ;
-  new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist), coreLV, "corePV_ref", worldLV, false, 0, checkOverlaps) ;
+  new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist + fibre_length), coreLV, "corePV_ref", worldLV, false, 0, checkOverlaps) ;
   
   G4VSolid* capillaryS;
   G4LogicalVolume* capillaryLV;
@@ -185,7 +185,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
     }
     capillaryLV = new G4LogicalVolume (capillaryS, CaMaterial, "capillaryLV") ;
     new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), capillaryLV, "capillaryPV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist), capillaryLV, "capillaryPV_ref", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist + fibre_length), capillaryLV, "capillaryPV_ref", worldLV, false, 0, checkOverlaps) ;
   }
   
   G4VSolid* claddingS;
@@ -201,7 +201,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
     }
     claddingLV = new G4LogicalVolume (claddingS, ClMaterial, "claddingLV") ;  
     new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), claddingLV, "claddingPV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist), claddingLV, "claddingPV_ref", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist + fibre_length), claddingLV, "claddingPV_ref", worldLV, false, 0, checkOverlaps) ;
   }
   
   
@@ -237,8 +237,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   new G4PVPlacement (0, G4ThreeVector (0., 0., 0.), latGapLayerLV, "latGapLayerPV", worldLV, false, 0, checkOverlaps) ;
   new G4PVPlacement (0, G4ThreeVector (0., 0., 0.),      latGapLV,      "latGapPV", worldLV, false, 0, checkOverlaps) ;
   
-  new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist), latGapLayerLV, "latGapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-  new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist),      latGapLV,      "latGapPV_ref", worldLV, false, 0, checkOverlaps) ;
+  new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + fibre_length), latGapLayerLV, "latGapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+  new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + fibre_length),      latGapLV,      "latGapPV_ref", worldLV, false, 0, checkOverlaps) ;
   
   //end gaps
   G4VSolid* gapLayerS;
@@ -253,11 +253,11 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   G4LogicalVolume* gapLV      = new G4LogicalVolume (gapS,      GaMaterial,      "gapLV") ;
   
   
-  new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+0.5*depth),          gapLayerLV, "gapLayerPV", worldLV, false, 0, checkOverlaps) ;
+  new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV", worldLV, false, 0, checkOverlaps) ;
   new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      "gapPV", worldLV, false, 0, checkOverlaps) ;
   
-  new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+0.5*depth),          gapLayerLV, "gapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-  new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      "gapPV_ref", worldLV, false, 0, checkOverlaps) ;
+  new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+0.5*depth + fibre_length),          gapLayerLV, "gapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+  new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+depth+0.5*(gap_l-depth) + fibre_length), gapLV,      "gapPV_ref", worldLV, false, 0, checkOverlaps) ;
   
 
   
@@ -277,8 +277,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
     new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
     new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
     
-    new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_ref", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+0.5*depth + fibre_length),          detLayerLV, "detLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth) + fibre_length), detLV,      "detPV_ref", worldLV, false, 0, checkOverlaps) ;
     
 
   }
