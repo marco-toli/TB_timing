@@ -1,0 +1,25 @@
+# Macro file for the
+# initialization of G4GeneralParticleSource
+
+# cosmics
+/gps/energy 150 GeV
+/gps/particle mu-
+/gps/pos/type Plane
+/gps/pos/shape Square
+/gps/pos/halfx 0.1 mm
+/gps/pos/halfy 0.1 mm
+#/gps/ang/sigma_x 35 deg
+#/gps/ang/sigma_y 3 deg
+/gps/ang/type beam2d
+#/gps/ang/rot1 0. 1. 0.
+#/gps/ang/rot2 0. 0. -1.
+/gps/direction 0 0 1
+
+# radioactive source
+# 511 for Sodium, 662 for Cesium, 160 for Co57, 1250 for Co60
+#/gps/energy 160 keV	
+#/gps/particle gamma
+#/gps/ang/type iso
+
+#/tracking/verbose 1
+/run/beamOn 1
