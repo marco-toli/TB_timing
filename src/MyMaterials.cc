@@ -1258,7 +1258,7 @@ G4Material* MyMaterials::LSO()
     { 0.10, 0.46, 0.60, 0.68,
       0.74, 0.80, 0.82, 0.84,
       0.87,  0.96,  0.98,  1.00 };
-  for(int i=0; i < nEntries_SCY; i++)    ScintilYield[i] = 40000.*MeV*ScintilYield[i]*ElectronEnergy_SCY[i];
+  for(int i=0; i < nEntries_SCY; i++)    ScintilYield[i] = 400.*MeV*ScintilYield[i]*ElectronEnergy_SCY[i];
   
   G4MaterialPropertiesTable* myMPT = new G4MaterialPropertiesTable();
   myMPT->AddProperty("FASTCOMPONENT", PhotonEnergy_FAST, FastComponent,   nEntries_FAST);
@@ -1266,7 +1266,7 @@ G4Material* MyMaterials::LSO()
   //myMPT->AddProperty("RAYLEIGH",      PhotonEnergy_RI,   Rayleigh,        nEntries_RI);
   myMPT->AddProperty("ABSLENGTH",     PhotonEnergy_ABS,  Absorption,      nEntries_ABS);
   myMPT->AddProperty("ELECTRONSCINTILLATIONYIELD", ElectronEnergy_SCY, ScintilYield, nEntries_SCY);
-  myMPT->AddConstProperty("SCINTILLATIONYIELD", 40000./MeV);
+  myMPT->AddConstProperty("SCINTILLATIONYIELD", 400./MeV);
   myMPT->AddConstProperty("RESOLUTIONSCALE", 3.2);
   myMPT->AddConstProperty("FASTTIMECONSTANT", 40.*ns);
   myMPT->AddConstProperty("YIELDRATIO", 1.0);

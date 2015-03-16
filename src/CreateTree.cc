@@ -34,6 +34,13 @@ CreateTree::CreateTree (TString name)
 //   this -> GetTree() -> Branch("depositedEnergyCladding",  &this->depositedEnergyCladding,   "depositedEnergyCladding/F");
   this -> GetTree() -> Branch("depositedEnergyWorld",     &this->depositedEnergyWorld,         "depositedEnergyWorld/F");
   
+  this -> GetTree() -> Branch("E_dep_f",   &E_dep_f);
+  this -> GetTree() -> Branch("E_dep_time_f",   &E_dep_time_f);
+  
+  this -> GetTree() -> Branch("E_dep_r",   &E_dep_r);
+  this -> GetTree() -> Branch("E_dep_time_r",   &E_dep_time_r);
+  
+  
   this -> GetTree() -> Branch("time_prod_scint", &time_prod_scint);
   this -> GetTree() -> Branch("time_prod_cher",  &time_prod_cher);
   this -> GetTree() -> Branch("time_ext_scint",  &time_ext_scint);
@@ -195,6 +202,11 @@ void CreateTree::Clear()
   {
     inputMomentum ->at(i) = 0.;
   }
+  
+  E_dep_f.clear();
+  E_dep_time_f.clear();
+  E_dep_r.clear();
+  E_dep_time_r.clear();
   
   time_ext_cher.clear();
   time_ext_scint.clear();

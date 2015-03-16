@@ -287,11 +287,15 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
     if( thePrePVName == "corePV" )
     {
       CreateTree::Instance()->depositedEnergyCore_f += energy/GeV;
+      CreateTree::Instance()->E_dep_f.push_back(energy/GeV);
+      CreateTree::Instance()->E_dep_time_f.push_back(thePrePoint->GetGlobalTime()/picosecond);
     }
     
     if( thePrePVName == "corePV_ref" )
     {
       CreateTree::Instance()->depositedEnergyCore_r += energy/GeV;
+      CreateTree::Instance()->E_dep_r.push_back(energy/GeV);
+      CreateTree::Instance()->E_dep_time_r.push_back(thePrePoint->GetGlobalTime()/picosecond);
     }
     
     if( thePrePVName.contains("capillary") )
