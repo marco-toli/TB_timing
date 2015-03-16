@@ -40,6 +40,11 @@ public:
   std::vector<float>* inputMomentum ; // Px Py Pz E
   std::vector<float>* inputInitialPosition ; // x, y, z
    
+  std::vector<float> E_dep_f;
+  std::vector<float> E_dep_time_f;
+  std::vector<float> E_dep_r;
+  std::vector<float> E_dep_time_r;
+  
   std::vector<float> time_ext_scint;
   std::vector<float> time_ext_cher;
   std::vector<float> time_prod_scint;
