@@ -106,6 +106,7 @@ void G4EmUserPhysics::ConstructProcess()
   
   theScintillationProcess->SetScintillationYieldFactor(1.);
   theScintillationProcess->SetTrackSecondariesFirst(true);
+  theScintillationProcess->SetFiniteRiseTime(true);
   
   // Use Birks Correction in the Scintillation process
   G4EmSaturation* emSaturation = G4LossTableManager::Instance()->EmSaturation();
