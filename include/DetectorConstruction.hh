@@ -116,6 +116,7 @@ private:
   G4double depth;
   G4double cryst_dist;
   G4double abs_thick;
+  G4int crystal_conf;
   
   G4UniformMagField* B_field;
   G4bool   B_field_IsInitialized; 
