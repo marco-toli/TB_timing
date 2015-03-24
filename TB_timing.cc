@@ -57,7 +57,7 @@
 #include "G4EmUserPhysics.hh"
 #include "G4EmStandardPhysics.hh"
 #include "G4VModularPhysicsList.hh"
-#include "G4StepLimiterBuilder.hh"
+//#include "G4StepLimiterBuilder.hh"
 
 
 #include "QGSP_BERT.hh"
@@ -193,7 +193,7 @@ int main(int argc,char** argv)
   G4cout << ">>> Define physics list::begin <<<" << G4endl; 
   G4VModularPhysicsList* physics = factory.GetReferencePhysList(physName);
   physics->RegisterPhysics(new G4EmUserPhysics(switchOnScintillation,switchOnCerenkov));
-  physics->RegisterPhysics(new G4StepLimiterBuilder());
+//   physics->RegisterPhysics(new G4StepLimiterBuilder());
   runManager-> SetUserInitialization(physics);
   G4cout << ">>> Define physics list::end <<<" << G4endl; 
   
