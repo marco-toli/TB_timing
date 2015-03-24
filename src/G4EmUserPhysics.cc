@@ -57,9 +57,9 @@
 #include "G4OpRayleigh.hh"
 #include "G4OpMieHG.hh"
 #include "G4OpBoundaryProcess.hh"
-#include "G4StepLimiterBuilder.hh"
+//#include "G4StepLimiterBuilder.hh"
 #include "G4UserLimits.hh"
-#include "G4StepLimiter.hh"
+//#include "G4StepLimiter.hh"
 #include "DetectorConstruction.hh"
 
 
@@ -140,8 +140,8 @@ void G4EmUserPhysics::ConstructProcess()
       pmanager->AddDiscreteProcess(theRayleighScatteringProcess);
       pmanager->AddDiscreteProcess(theMieHGScatteringProcess);
       pmanager->AddDiscreteProcess(theBoundaryProcess);
-      G4StepLimiter* stepLimiter = new G4StepLimiter();
-      pmanager->AddDiscreteProcess(stepLimiter);
+     // G4StepLimiter* stepLimiter = new G4StepLimiter();
+      //pmanager->AddDiscreteProcess(stepLimiter);
     }
   }
 }
