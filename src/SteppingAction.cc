@@ -13,7 +13,7 @@
 #include <vector>
 #include "TTree.h"
 
-long int CreateSeed();
+//long int CreateSeed();
 
 
 
@@ -318,36 +318,3 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
   return ;
 }
 
-long int CreateSeed()
-{
-  TRandom3 rangen;
-  
-  long int sec = time(0);
-  G4cout << "Time : " << sec << G4endl;
-  
-  sec += getpid();
-  G4cout << "PID  : " << getpid() << G4endl;
-  
-  FILE* fp = fopen ("/proc/uptime", "r");
-  int upsecs = 0;
-  if( fp != NULL )
-  {
-    char buf[BUFSIZ];
-    char *b = fgets(buf,BUFSIZ,fp);
-    if( b == buf )
-    {
-      /* The following sscanf must use the C locale.  */
-      setlocale(LC_NUMERIC, "C");
-      setlocale(LC_NUMERIC, "");
-    }
-    fclose(fp);
-  }
-  G4cout << "Upsecs: " << upsecs << G4endl;
-  sec += upsecs;
-  
-  G4cout << "Seed for srand: " << sec << G4endl;
-  srand(sec);
-  rangen.SetSeed(rand());
-  long int seed = round(1000000000000*rangen.Uniform());
-  return seed;
-}
