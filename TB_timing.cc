@@ -267,7 +267,7 @@ int main(int argc,char** argv)
     runManager -> Initialize();
     G4UImanager* UImanager = G4UImanager::GetUIpointer(); 
     config.readInto (gps_instructions_file, "gps_instructions_file") ;
-    UImanager -> ApplyCommand("/control/execute " + gps_instructions_file);
+    UImanager -> ApplyCommand("/control/execute /afs/cern.ch/work/m/mlucchin/TB_timing/" + gps_instructions_file);
   } 
   
   
