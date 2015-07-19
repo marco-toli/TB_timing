@@ -4,7 +4,7 @@ G4TARGET := $(name)
 G4EXLIB := true
 
 ifndef G4INSTALL
-  G4INSTALL = ../geant4.9.4.p01
+  G4INSTALL = ../geant4.10.1
 endif
 
 
