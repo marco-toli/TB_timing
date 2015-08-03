@@ -49,6 +49,11 @@ public:
   std::vector<float> time_ext_cher;
   std::vector<float> time_prod_scint;
   std::vector<float> time_prod_cher;
+
+  std::vector<float> lambda_ext_scint;
+  std::vector<float> lambda_ext_cher;
+  std::vector<float> lambda_prod_scint;
+  std::vector<float> lambda_prod_cher;
   
   std::vector<float> time_ext_scint_ref;
   std::vector<float> time_ext_cher_ref;
