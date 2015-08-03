@@ -45,6 +45,11 @@ CreateTree::CreateTree (TString name)
   this -> GetTree() -> Branch("time_prod_cher",  &time_prod_cher);
   this -> GetTree() -> Branch("time_ext_scint",  &time_ext_scint);
   this -> GetTree() -> Branch("time_ext_cher", 	 &time_ext_cher);
+
+  this -> GetTree() -> Branch("lambda_prod_scint", &lambda_prod_scint);
+  this -> GetTree() -> Branch("lambda_prod_cher",  &lambda_prod_cher);
+  this -> GetTree() -> Branch("lambda_ext_scint",  &lambda_ext_scint);
+  this -> GetTree() -> Branch("lambda_ext_cher",   &lambda_ext_cher);
   
   this -> GetTree() -> Branch("time_prod_scint_ref", &time_prod_scint_ref);
   this -> GetTree() -> Branch("time_prod_cher_ref",  &time_prod_cher_ref);
@@ -212,6 +217,11 @@ void CreateTree::Clear()
   time_ext_scint.clear();
   time_prod_cher.clear();
   time_prod_scint.clear();
+
+  lambda_ext_cher.clear();
+  lambda_ext_scint.clear();
+  lambda_prod_cher.clear();
+  lambda_prod_scint.clear();
   
   time_ext_cher_ref.clear();
   time_ext_scint_ref.clear();
