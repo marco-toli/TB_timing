@@ -101,15 +101,23 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
 //       cout << " in log volume " << endl;
       //save only prompt photons
       if (thePrePoint->GetGlobalTime()/picosecond>1000) theTrack->SetTrackStatus(fKillTrackAndSecondaries);
-      else if (thePrePVName == "corePV") CreateTree::Instance()->time_prod_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
-      else if (thePrePVName == "corePV_ref") CreateTree::Instance()->time_prod_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
+      else if (thePrePVName == "corePV") 
+      {
+	CreateTree::Instance()->time_prod_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
+	CreateTree::Instance()->lambda_prod_scint.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+      }
+      else if (thePrePVName == "corePV_ref") 
+      {
+	CreateTree::Instance()->time_prod_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
+	CreateTree::Instance()->lambda_prod_scint_ref.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+      }
       
       if( !propagateScintillation ) theTrack->SetTrackStatus(fKillTrackAndSecondaries);
       
-      CreateTree::Instance()->h_phot_sci_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
-//       CreateTree::Instance()->h_phot_sci_E      -> Fill( theTrack->GetTotalEnergy()/eV );
-      CreateTree::Instance()->h_phot_sci_time   -> Fill( thePrePoint->GetGlobalTime()/ns );
-//       CreateTree::Instance()->h_phot_sci_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
+//      CreateTree::Instance()->h_phot_sci_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+//      CreateTree::Instance()->h_phot_sci_E      -> Fill( theTrack->GetTotalEnergy()/eV );
+//      CreateTree::Instance()->h_phot_sci_time   -> Fill( thePrePoint->GetGlobalTime()/ns );
+//      CreateTree::Instance()->h_phot_sci_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
     }
     
         
@@ -117,15 +125,23 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
         (nStep == 1) && (processName == "Cerenkov") )
     {
       CreateTree::Instance()->tot_phot_cer += 1;
-      if (thePrePVName == "corePV") CreateTree::Instance()->time_prod_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
-      else if (thePrePVName == "corePV_ref") CreateTree::Instance()->time_prod_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
+      if (thePrePVName == "corePV")
+      {
+	CreateTree::Instance()->time_prod_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
+	CreateTree::Instance()->lambda_prod_cher.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+      }
+      else if (thePrePVName == "corePV_ref")
+      {
+	CreateTree::Instance()->time_prod_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
+	CreateTree::Instance()->lambda_prod_cher_ref.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+      }
 
       if( !propagateCerenkov ) theTrack->SetTrackStatus(fKillTrackAndSecondaries);      
       
-      CreateTree::Instance()->h_phot_cer_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
-//       CreateTree::Instance()->h_phot_cer_E      -> Fill( theTrack->GetTotalEnergy()/eV );
-      CreateTree::Instance()->h_phot_cer_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
-//       CreateTree::Instance()->h_phot_cer_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
+//      CreateTree::Instance()->h_phot_cer_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+//      CreateTree::Instance()->h_phot_cer_E      -> Fill( theTrack->GetTotalEnergy()/eV );
+//      CreateTree::Instance()->h_phot_cer_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+//      CreateTree::Instance()->h_phot_cer_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
     }
     
     
@@ -178,9 +194,9 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       else if (thePrePVName == "gapLayerPV_ref") CreateTree::Instance()->time_ext_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
       // if you do not want to kill a photon once it exits the fiber, comment here below
       theTrack->SetTrackStatus(fKillTrackAndSecondaries);      
-      CreateTree::Instance()->h_phot_sci_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+//       CreateTree::Instance()->h_phot_sci_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
 //       CreateTree::Instance()->h_phot_sci_gap_E      -> Fill( theTrack->GetTotalEnergy()/eV );
-      CreateTree::Instance()->h_phot_sci_gap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+//       CreateTree::Instance()->h_phot_sci_gap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
 //       CreateTree::Instance()->h_phot_sci_gap_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
 //       CreateTree::Instance()->h_phot_sci_gap_angleWithSurfNormal -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackDirection)) );
     }
@@ -198,9 +214,9 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       if (thePrePVName == "gapLayerPV") CreateTree::Instance()->time_ext_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
       else if (thePrePVName == "gapLayerPV_ref") CreateTree::Instance()->time_ext_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
       
-      CreateTree::Instance()->h_phot_cer_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+//       CreateTree::Instance()->h_phot_cer_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
 //       CreateTree::Instance()->h_phot_cer_gap_E      -> Fill( theTrack->GetTotalEnergy()/eV );
-      CreateTree::Instance()->h_phot_cer_gap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+//       CreateTree::Instance()->h_phot_cer_gap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
 //       CreateTree::Instance()->h_phot_cer_gap_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
 //       CreateTree::Instance()->h_phot_cer_gap_angleWithSurfNormal -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackDirection)) );
     }
