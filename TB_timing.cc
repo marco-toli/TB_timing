@@ -48,6 +48,7 @@
 #include <ctime>
 
 #include "TString.h"
+#include "TTree.h"
 #include "TRandom3.h"
 #include "TCint.h"
 
@@ -139,8 +140,9 @@ int main(int argc,char** argv)
   
   // Create output tree
   //
+  G4cout << "before creating tree" << G4endl;
   CreateTree* mytree = new CreateTree ("tree");
-
+  G4cout << "after creating tree" << G4endl;
   
   // Get runtime options
   //
@@ -150,6 +152,7 @@ int main(int argc,char** argv)
   G4int propagateScintillation = config.read<int> ("propagateScintillation");
   G4int propagateCerenkov = config.read<int> ("propagateCerenkov");
   
+  G4cout << "before run manager" << G4endl;
   
   // User Verbose output class
   //
@@ -253,6 +256,7 @@ int main(int argc,char** argv)
     G4UIExecutive * ui = new G4UIExecutive(argc,argv);
     #ifdef G4VIS_USE
     UImanager -> ApplyCommand("/control/execute vis.mac");     
+    cout << "ok finqui ... " << endl;
     #endif
     ui -> SessionStart();
     delete ui;
