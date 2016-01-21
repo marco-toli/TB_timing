@@ -708,6 +708,81 @@ G4Material* MyMaterials::DSB_Ce()  // Nanostructured glass ceramics scintillator
 }
 
 
+G4Material* MyMaterials::LuAG_undoped() // Lutetium Aluminum Garnet - undoped
+{
+  G4double a, z, density;
+  G4Element*  O = new G4Element("Oxygen",   "O",  z=8.,  a= 16.00*g/mole);
+  G4Element* Lu = new G4Element("Lutetium", "Lu", z=71., a=174.97*g/mole);
+  G4Element* Al = new G4Element("Aluminum", "Al", z=27., a= 28.09*g/mole);
+  
+  G4Material* mat = new G4Material("LuAG_Ce", density=6.7*g/cm3,3);
+  mat->AddElement(Lu,3);
+  mat->AddElement(Al,12);
+  mat->AddElement(O,5);
+    
+  const G4int nEntries_RI = 42;
+  G4double PhotonEnergy_RI[nEntries_RI] = 
+    { 0.1000*eV, 1.0000*eV, 1.0121*eV, 1.0332*eV, 
+      1.0552*eV, 1.0781*eV, 1.1021*eV, 1.1271*eV, 
+      1.1533*eV, 1.1808*eV, 1.2096*eV, 1.2398*eV, 
+      1.2716*eV, 1.3051*eV, 1.3404*eV, 1.3776*eV, 
+      1.4170*eV, 1.4586*eV, 1.5028*eV, 1.5498*eV, 
+      1.5998*eV, 1.6531*eV, 1.7101*eV, 1.7712*eV, 
+      1.8368*eV, 1.9074*eV, 1.9837*eV, 2.0664*eV, 
+      2.1562*eV, 2.2543*eV, 2.3616*eV, 2.4797*eV, 
+      2.6102*eV, 2.7552*eV, 2.9173*eV, 3.0996*eV, 
+      3.3062*eV, 3.5424*eV, 3.8149*eV, 4.1328*eV, 
+      4.5085*eV, 4.9594*eV };
+  
+  G4double RefractiveIndex[nEntries_RI] = 
+    { 1.8212, 1.8212, 1.8215, 1.8219, 
+      1.8223, 1.8227, 1.8231, 1.8236, 
+      1.8240, 1.8245, 1.8250, 1.8255, 
+      1.8261, 1.8266, 1.8272, 1.8279, 
+      1.8285, 1.8293, 1.8300, 1.8308, 
+      1.8317, 1.8327, 1.8338, 1.8349, 
+      1.8362, 1.8376, 1.8392, 1.8410, 
+      1.8430, 1.8453, 1.8479, 1.8509, 
+      1.8545, 1.8587, 1.8637, 1.8699, 
+      1.8774, 1.8869, 1.8991, 1.9152, 
+      1.9374, 1.9694 };
+  
+  //G4double Rayleigh[nEntries_RI] =
+  //  { 138.*mm, 138.*mm, 138.*mm };
+  
+  const G4int nEntries_ABS = 89;
+  G4double PhotonEnergy_ABS[nEntries_ABS] =
+    { 1.78417*eV, 1.7971*eV, 1.81022*eV, 1.82353*eV, 1.83704*eV, 1.85075*eV, 1.86466*eV, 1.87879*eV, 1.89313*eV, 1.90769*eV,
+      1.92248*eV, 1.9375*eV, 1.95276*eV, 1.96825*eV, 1.984*eV, 2*eV, 2.01626*eV, 2.03279*eV, 2.04959*eV, 2.06667*eV,
+      2.08403*eV, 2.10169*eV, 2.11966*eV, 2.13793*eV, 2.15652*eV, 2.17544*eV, 2.19469*eV, 2.21429*eV, 2.23423*eV, 2.25455*eV,
+      2.27523*eV, 2.2963*eV, 2.31776*eV, 2.33962*eV, 2.3619*eV, 2.38462*eV, 2.40777*eV, 2.43137*eV, 2.45545*eV, 2.48*eV,
+      2.50505*eV, 2.53061*eV, 2.5567*eV, 2.58333*eV, 2.61053*eV, 2.6383*eV, 2.66667*eV, 2.69565*eV, 2.72527*eV, 2.75556*eV,
+      2.78652*eV, 2.81818*eV, 2.85057*eV, 2.88372*eV, 2.91765*eV, 2.95238*eV, 2.98795*eV, 3.02439*eV, 3.06173*eV, 3.1*eV,
+      3.13924*eV, 3.17949*eV, 3.22078*eV, 3.26316*eV, 3.30667*eV, 3.35135*eV, 3.39726*eV, 3.44444*eV, 3.49296*eV, 3.54286*eV,
+      3.5942*eV, 3.64706*eV, 3.70149*eV, 3.75758*eV, 3.81538*eV, 3.875*eV, 3.93651*eV, 4*eV, 4.06557*eV, 4.13333*eV,
+      4.20339*eV, 4.27586*eV, 4.35088*eV, 4.42857*eV, 4.50909*eV, 4.59259*eV, 4.67925*eV, 4.76923*eV, 4.86275*eV };
+  G4double Absorption[nEntries_ABS] =
+    { 1.66482*m, 1.0584*m, 1.90233*m, 0.958758*m, 1.16913*m, 1.05368*m, 0.881739*m, 2.74593*m, 0.969113*m, 1.30342*m,
+      1.11065*m, 1.14053*m, 0.926481*m, 0.835474*m, 0.814388*m, 0.702776*m, 1.01264*m, 0.749002*m, 0.691299*m, 0.791851*m,
+      0.708582*m, 0.609636*m, 0.625308*m, 0.59058*m, 0.522642*m, 0.599727*m, 0.595345*m, 0.594927*m, 0.574464*m, 0.541271*m,
+      0.531547*m, 0.581632*m, 0.57251*m, 0.560577*m, 0.493902*m, 0.422165*m, 0.354962*m, 0.255139*m, 0.151762*m, 0.0827965*m,
+      0.0409174*m, 0.02007*m, 0.0100463*m, 0.00588694*m, 0.00636339*m, 0.0084497*m, 0.0224574*m, 0.0509883*m, 0.262914*m, 0.0571499*m,
+      0.0830375*m, 0.378696*m, 0.0528428*m, 0.0661874*m, 0.0930821*m, 0.0672707*m, 0.0152385*m, 0.00676752*m, 0.00538106*m, 0.00799596*m,
+      0.0177025*m, 0.0411282*m, 0.0919861*m, 0.149875*m, 0.132761*m, 0.068419*m, 0.0246548*m, 0.00922619*m, 0.00902168*m, 0.0264256*m,
+      0.0839517*m, 0.0796384*m, 0.0552649*m, 0.0197203*m, 0.00872616*m, 0.00764327*m, 0.0153009*m, 0.0299903*m, 0.0403526*m, 0.0377371*m,
+      0.0322887*m, 0.0251734*m, 0.0194992*m, 0.0145645*m, 0.0112908*m, 0.0100775*m, 0.0112081*m, 0.0158907*m, 0.019793*m };
+  
+  G4MaterialPropertiesTable* myMPT = new G4MaterialPropertiesTable();
+  myMPT->AddProperty("RINDEX",        PhotonEnergy_RI,   RefractiveIndex, nEntries_RI);
+  //myMPT->AddProperty("RAYLEIGH",      PhotonEnergy_RI,   Rayleigh,        nEntries_RI);
+  myMPT->AddProperty("ABSLENGTH",     PhotonEnergy_ABS,  Absorption,      nEntries_ABS);
+  myMPT->AddConstProperty("SCINTILLATIONYIELD",0/MeV);
+  
+  mat->SetMaterialPropertiesTable(myMPT);
+  
+  return mat;
+}
+
 
 G4Material* MyMaterials::LuAG_Ce() // Lutetium Aluminum Garnet - Ce-doped
 {

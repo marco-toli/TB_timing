@@ -90,8 +90,7 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
   if( particleType == G4OpticalPhoton::OpticalPhotonDefinition() )
   {
     G4String processName = theTrack->GetCreatorProcess()->GetProcessName();
-    
-    
+        
     //----------------------------
     // count photons at production
     if( ( theTrack->GetLogicalVolumeAtVertex()->GetName().contains("core") ) &&
@@ -103,13 +102,13 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       if (thePrePoint->GetGlobalTime()/picosecond>1000) theTrack->SetTrackStatus(fKillTrackAndSecondaries);
       else if (thePrePVName == "corePV") 
       {
-	CreateTree::Instance()->time_prod_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
-	CreateTree::Instance()->lambda_prod_scint.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+//	CreateTree::Instance()->time_prod_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
+//	CreateTree::Instance()->lambda_prod_scint.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
       }
       else if (thePrePVName == "corePV_ref") 
       {
-	CreateTree::Instance()->time_prod_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
-	CreateTree::Instance()->lambda_prod_scint_ref.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+//	CreateTree::Instance()->time_prod_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
+//	CreateTree::Instance()->lambda_prod_scint_ref.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
       }
       
       if( !propagateScintillation ) theTrack->SetTrackStatus(fKillTrackAndSecondaries);
@@ -127,13 +126,13 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       CreateTree::Instance()->tot_phot_cer += 1;
       if (thePrePVName == "corePV")
       {
-	CreateTree::Instance()->time_prod_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
-	CreateTree::Instance()->lambda_prod_cher.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+//	CreateTree::Instance()->time_prod_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
+//	CreateTree::Instance()->lambda_prod_cher.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
       }
       else if (thePrePVName == "corePV_ref")
       {
-	CreateTree::Instance()->time_prod_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
-	CreateTree::Instance()->lambda_prod_cher_ref.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+//	CreateTree::Instance()->time_prod_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
+//	CreateTree::Instance()->lambda_prod_cher_ref.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
       }
 
       if( !propagateCerenkov ) theTrack->SetTrackStatus(fKillTrackAndSecondaries);      
@@ -190,7 +189,11 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
         ((thePrePVName == "gapLayerPV") && (thePostPVName == "gapPV") || (thePrePVName == "gapLayerPV_ref") && (thePostPVName == "gapPV_ref")) )
     {
       CreateTree::Instance()->tot_gap_phot_sci += 1;
-      if (thePrePVName == "gapLayerPV") CreateTree::Instance()->time_ext_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
+      if (thePrePVName == "gapLayerPV") 
+      {
+	CreateTree::Instance()->time_ext_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
+//	CreateTree::Instance()->lambda_ext_scint.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+      }
       else if (thePrePVName == "gapLayerPV_ref") CreateTree::Instance()->time_ext_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
       // if you do not want to kill a photon once it exits the fiber, comment here below
       theTrack->SetTrackStatus(fKillTrackAndSecondaries);      
@@ -211,7 +214,11 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       // if you do not want to kill a photon once it exits the fiber, comment here below
       theTrack->SetTrackStatus(fKillTrackAndSecondaries);
       
-      if (thePrePVName == "gapLayerPV") CreateTree::Instance()->time_ext_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
+      if (thePrePVName == "gapLayerPV")
+      {
+	CreateTree::Instance()->time_ext_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
+//	CreateTree::Instance()->lambda_ext_cher.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+      } 
       else if (thePrePVName == "gapLayerPV_ref") CreateTree::Instance()->time_ext_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
       
 //       CreateTree::Instance()->h_phot_cer_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
@@ -303,15 +310,15 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
     if( thePrePVName == "corePV" )
     {
       CreateTree::Instance()->depositedEnergyCore_f += energy/GeV;
-      CreateTree::Instance()->E_dep_f.push_back(energy/GeV);
-      CreateTree::Instance()->E_dep_time_f.push_back(thePrePoint->GetGlobalTime()/picosecond);
+//      CreateTree::Instance()->E_dep_f.push_back(energy/GeV);
+//      CreateTree::Instance()->E_dep_time_f.push_back(thePrePoint->GetGlobalTime()/picosecond);
     }
     
     if( thePrePVName == "corePV_ref" )
     {
       CreateTree::Instance()->depositedEnergyCore_r += energy/GeV;
-      CreateTree::Instance()->E_dep_r.push_back(energy/GeV);
-      CreateTree::Instance()->E_dep_time_r.push_back(thePrePoint->GetGlobalTime()/picosecond);
+ //     CreateTree::Instance()->E_dep_r.push_back(energy/GeV);
+ //     CreateTree::Instance()->E_dep_time_r.push_back(thePrePoint->GetGlobalTime()/picosecond);
     }
     
     if( thePrePVName.contains("capillary") )

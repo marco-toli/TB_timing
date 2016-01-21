@@ -132,13 +132,13 @@ bool CreateTree::Write(TFile * outfile)
   outfile -> cd();
   ftree -> Write();
   
-  h_phot_sci_lambda->Write();
+//  h_phot_sci_lambda->Write();
 //   h_phot_sci_E->Write();
-  h_phot_sci_time->Write();
+//  h_phot_sci_time->Write();
 //   h_phot_sci_angleAtProduction -> Write();
-  h_phot_cer_lambda->Write();
+//  h_phot_cer_lambda->Write();
 //   h_phot_cer_E->Write();
-  h_phot_cer_time->Write();
+//  h_phot_cer_time->Write();
 //   h_phot_cer_angleAtProduction -> Write();
   /*
   h_phot_sci_latGap_lambda->Write();
@@ -152,14 +152,14 @@ bool CreateTree::Write(TFile * outfile)
   h_phot_cer_latGap_angleAtProduction->Write();
   h_phot_cer_latGap_angleWithSurfNormal->Write();*/
   
-  h_phot_sci_gap_lambda->Write();
+//  h_phot_sci_gap_lambda->Write();
 //   h_phot_sci_gap_E->Write();
-  h_phot_sci_gap_time->Write();
+//  /h_phot_sci_gap_time->Write();
 //   h_phot_sci_gap_angleAtProduction->Write();
 //   h_phot_sci_gap_angleWithSurfNormal->Write();
-  h_phot_cer_gap_lambda->Write();
+//  h_phot_cer_gap_lambda->Write();
 //   h_phot_cer_gap_E->Write();
-  h_phot_cer_gap_time->Write();
+//  h_phot_cer_gap_time->Write();
 //   h_phot_cer_gap_angleAtProduction->Write();
 //   h_phot_cer_gap_angleWithSurfNormal->Write();
   /*
