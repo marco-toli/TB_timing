@@ -65,14 +65,13 @@ CreateTree::CreateTree (TString name)
   this -> GetTree() -> Branch("tot_det_phot_sci",    &this->tot_det_phot_sci,       "tot_det_phot_sci/I");
   this -> GetTree() -> Branch("tot_det_phot_cer",    &this->tot_det_phot_cer,       "tot_det_phot_cer/I");
   
-  h_phot_sci_lambda = new TH1F("h_phot_sci_lambda","",1000,250.,1250.);
-//   h_phot_sci_E = new TH1F("h_phot_sci_E","",1000,0.,5.);
-  h_phot_sci_time = new TH1F("h_phot_sci_time","",100000,0.,100000.);
-//   h_phot_sci_angleAtProduction = new TH1F("h_phot_sci_angleAtProduction","",2000,-1.,1.);
-  h_phot_cer_lambda = new TH1F("h_phot_cer_lambda","",1000,250.,1250.);
-//   h_phot_cer_E = new TH1F("h_phot_cer_E","",1000,0.,5.);
-  h_phot_cer_time = new TH1F("h_phot_cer_time","",100000,0.,100000.);
-//   h_phot_cer_angleAtProduction = new TH1F("h_phot_cer_angleAtProduction","",2000,-1.,1.);
+  h_phot_sci_lambda = new TH1F("h_phot_sci_lambda","",1250,0.,1250.);
+  h_phot_sci_time = new TH1F("h_phot_sci_time","",100000,0.,5000.);
+  h_phot_sci_angleAtProduction = new TH1F("h_phot_sci_angleAtProduction","",2000,0.,360.);
+
+  h_phot_cer_lambda = new TH1F("h_phot_cer_lambda","",1250, 0.,1250.);
+  h_phot_cer_time = new TH1F("h_phot_cer_time","",100000,0.,5000.);
+  h_phot_cer_angleAtProduction = new TH1F("h_phot_cer_angleAtProduction","",2000,0.,360.);
   
 //   h_phot_sci_latGap_lambda = new TH1F("h_phot_sci_latGap_lambda","",1000,250.,1250.);
 //   h_phot_sci_latGap_E = new TH1F("h_phot_sci_latGap_E","",1000,0.,5.);
@@ -82,27 +81,30 @@ CreateTree::CreateTree (TString name)
 //   h_phot_cer_latGap_lambda = new TH1F("h_phot_cer_latGap_lambda","",1000,250.,1250.);
 //   h_phot_cer_latGap_E = new TH1F("h_phot_cer_latGap_E","",1000,0.,5.);
 //   h_phot_cer_latGap_time = new TH1F("h_phot_cer_latGap_time","",10000,0.,10000.);
-//   h_phot_cer_latGap_angleAtProduction = new TH1F("h_phot_cer_latGap_angleAtProduction","",2000,-1.,1.);
-//   h_phot_cer_latGap_angleWithSurfNormal = new TH1F("h_phot_cer_latGap_angleWithSurfNormal","",2000,-1.,1.);
+//  h_phot_cer_latGap_angleAtProduction = new TH1F("h_phot_cer_latGap_angleAtProduction","",2000,-1.,1.);
+//  h_phot_cer_latGap_angleWithSurfNormal = new TH1F("h_phot_cer_latGap_angleWithSurfNormal","",2000,-1.,1.);
   
-  h_phot_sci_gap_lambda = new TH1F("h_phot_sci_gap_lambda","",1000,250.,1250.);
-//   h_phot_sci_gap_E = new TH1F("h_phot_sci_gap_E","",1000,0.,5.);
-  h_phot_sci_gap_time = new TH1F("h_phot_sci_gap_time","",100000,0.,100000.);
-//   h_phot_sci_gap_angleAtProduction = new TH1F("h_phot_sci_gap_angleAtProduction","",2000,-1.,1.);
-//   h_phot_sci_gap_angleWithSurfNormal = new TH1F("h_phot_sci_gap_angleWithSurfNormal","",2000,-1.,1.);
-  h_phot_cer_gap_lambda = new TH1F("h_phot_cer_gap_lambda","",1000,250.,1250.);
-//   h_phot_cer_gap_E = new TH1F("h_phot_cer_gap_E","",1000,0.,5.);
-  h_phot_cer_gap_time = new TH1F("h_phot_cer_gap_time","",100000,0.,100000.);
-//   h_phot_cer_gap_angleAtProduction = new TH1F("h_phot_cer_gap_angleAtProduction","",2000,-1.,1.);
-//   h_phot_cer_gap_angleWithSurfNormal = new TH1F("h_phot_cer_gap_angleWithSurfNormal","",2000,-1.,1.);
+  h_phot_sci_gap_lambda = new TH1F("h_phot_sci_gap_lambda","",1250, 0.,1250.);
+  h_phot_sci_gap_time = new TH1F("h_phot_sci_gap_time","",100000,0.,5000.);
+  h_phot_sci_gap_angleAtProduction = new TH1F("h_phot_sci_gap_angleAtProduction","",2000,0.,360.);
+  h_phot_sci_gap_angleWithSurfNormal = new TH1F("h_phot_sci_gap_angleWithSurfNormal","",2000,0.,360.);
+
+  h_phot_cer_gap_lambda = new TH1F("h_phot_cer_gap_lambda","",1250,0.,1250.);
+  h_phot_cer_gap_time = new TH1F("h_phot_cer_gap_time","",100000,0.,5000.);
+  h_phot_cer_gap_angleAtProduction = new TH1F("h_phot_cer_gap_angleAtProduction","",2000,0.,360.);
+  h_phot_cer_gap_angleWithSurfNormal = new TH1F("h_phot_cer_gap_angleWithSurfNormal","",2000,0.,360.);
+
+  h_phot_sci_det_lambda = new TH1F("h_phot_sci_gap_lambda","",1250, 0.,1250.);
+  h_phot_sci_det_time = new TH1F("h_phot_sci_det_time","",100000,0.,5000.);
+  h_phot_sci_det_angleAtProduction = new TH1F("h_phot_sci_det_angleAtProduction","",2000,0.,360.);
+  h_phot_sci_det_angleWithSurfNormal = new TH1F("h_phot_sci_det_angleWithSurfNormal","",2000,0.,360.);
+
+  h_phot_cer_det_lambda = new TH1F("h_phot_cer_det_lambda","",1250,0.,1250.);
+  h_phot_cer_det_time = new TH1F("h_phot_cer_det_time","",100000,0.,5000.);
+  h_phot_cer_det_angleAtProduction = new TH1F("h_phot_cer_det_angleAtProduction","",2000,0.,360.);
+  h_phot_cer_det_angleWithSurfNormal = new TH1F("h_phot_cer_det_angleWithSurfNormal","",2000,0.,360.);
   
-//   h_phot_sci_befgap_angleAtProduction = new TH1F("h_phot_sci_befgap_angleAtProduction","",2000,-1.,1.);
-//   h_phot_cer_befgap_angleAtProduction = new TH1F("h_phot_cer_befgap_angleAtProduction","",2000,-1.,1.);
-  
-//   h_phot_sci_befdet_angleWithSurfNormal = new TH1F("h_phot_sci_befdet_angleWithSurfNormal","",2000,-1.,1.);
-//   h_phot_cer_befdet_angleWithSurfNormal = new TH1F("h_phot_cer_befdet_angleWithSurfNormal","",2000,-1.,1.);
-//   h_phot_sci_det_angleWithSurfNormal = new TH1F("h_phot_sci_det_angleWithSurfNormal","",2000,-1.,1.);
-//   h_phot_cer_det_angleWithSurfNormal = new TH1F("h_phot_cer_det_angleWithSurfNormal","",2000,-1.,1.);
+
   
   this -> Clear() ;
 }
@@ -132,14 +134,14 @@ bool CreateTree::Write(TFile * outfile)
   outfile -> cd();
   ftree -> Write();
   
-//  h_phot_sci_lambda->Write();
-//   h_phot_sci_E->Write();
-//  h_phot_sci_time->Write();
-//   h_phot_sci_angleAtProduction -> Write();
-//  h_phot_cer_lambda->Write();
-//   h_phot_cer_E->Write();
-//  h_phot_cer_time->Write();
-//   h_phot_cer_angleAtProduction -> Write();
+  h_phot_sci_lambda->Write();
+  h_phot_sci_time->Write();
+  h_phot_sci_angleAtProduction -> Write();
+
+  h_phot_cer_lambda->Write();
+  h_phot_cer_time->Write();
+  h_phot_cer_angleAtProduction -> Write();
+
   /*
   h_phot_sci_latGap_lambda->Write();
   h_phot_sci_latGap_E->Write();
@@ -152,25 +154,25 @@ bool CreateTree::Write(TFile * outfile)
   h_phot_cer_latGap_angleAtProduction->Write();
   h_phot_cer_latGap_angleWithSurfNormal->Write();*/
   
-//  h_phot_sci_gap_lambda->Write();
-//   h_phot_sci_gap_E->Write();
-//  /h_phot_sci_gap_time->Write();
-//   h_phot_sci_gap_angleAtProduction->Write();
-//   h_phot_sci_gap_angleWithSurfNormal->Write();
-//  h_phot_cer_gap_lambda->Write();
-//   h_phot_cer_gap_E->Write();
-//  h_phot_cer_gap_time->Write();
-//   h_phot_cer_gap_angleAtProduction->Write();
-//   h_phot_cer_gap_angleWithSurfNormal->Write();
-  /*
-  h_phot_sci_befgap_angleAtProduction->Write();
-  h_phot_cer_befgap_angleAtProduction->Write();
-  
-  h_phot_sci_befdet_angleWithSurfNormal->Write();
-  h_phot_cer_befdet_angleWithSurfNormal->Write();
-  
+  h_phot_sci_gap_lambda->Write();
+  h_phot_sci_gap_time->Write();
+  h_phot_sci_gap_angleAtProduction->Write();
+  h_phot_sci_gap_angleWithSurfNormal->Write();
+
+  h_phot_cer_gap_lambda->Write();
+  h_phot_cer_gap_time->Write();
+  h_phot_cer_gap_angleAtProduction->Write();
+  h_phot_cer_gap_angleWithSurfNormal->Write();
+
+  h_phot_sci_det_lambda->Write();
+  h_phot_sci_det_time->Write();
+  h_phot_sci_det_angleAtProduction->Write();
   h_phot_sci_det_angleWithSurfNormal->Write();
-  h_phot_cer_det_angleWithSurfNormal->Write();*/
+
+  h_phot_cer_det_lambda->Write();
+  h_phot_cer_det_time->Write();
+  h_phot_cer_det_angleAtProduction->Write();
+  h_phot_cer_det_angleWithSurfNormal->Write();
   
   return true ;
 }
