@@ -233,6 +233,9 @@ int main(int argc,char** argv)
   G4cout << ">>> Define TrackingAction::end <<<" << G4endl;
   
   G4cout << ">>> Define SteppingAction::begin <<<" << G4endl; 
+/*  SteppingAction* stepping_action4toy = new SteppingAction(argv[1]);
+  runManager->SetUserAction(stepping_action4toy); */
+
   SteppingAction* stepping_action = new SteppingAction(detector,propagateScintillation,propagateCerenkov);
   runManager->SetUserAction(stepping_action); 
   G4cout << ">>> Define SteppingAction::end <<<" << G4endl;
