@@ -95,6 +95,7 @@ DetectorConstruction::DetectorConstruction (const string& configFileName)
   config.readInto(core_absLength,"core_absLength");
   
   config.readInto(crystal_conf,   "crystal_conf");
+  config.readInto(ref_crys,       "ref_crys");
   
   config.readInto(capillary_thickness,"capillary_thickness");
   config.readInto(capillary_material, "capillary_material");
@@ -107,14 +108,23 @@ DetectorConstruction::DetectorConstruction (const string& configFileName)
   config.readInto(cladding_absLength,"cladding_absLength");
   
   config.readInto(gap_l,       "gap_l");
+  config.readInto(gap_size,    "gap_size");
   config.readInto(gap_material,"gap_material");
   
   config.readInto(det_l,       "det_l");
+  config.readInto(det_size,    "det_size");
   config.readInto(det_material,"det_material");
   
   config.readInto(depth,	"depth");
   config.readInto(cryst_dist,	"cryst_dist");
   config.readInto(abs_thick,	"abs_thick");
+  
+  if (core_material == 0)
+  {
+	  config.readInto(toy_ly,	"toy_ly");
+	  config.readInto(toy_decay,	"toy_decay");
+	  config.readInto(toy_rise,	"toy_rise");
+  }
   
   B_field_intensity = config.read<double>("B_field_intensity") * tesla ;
   
@@ -173,16 +183,18 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   if( !fibre_isSquare ) coreS = new G4Tubs ("coreS", 0., core_radius, 0.5*fibre_length, 0.*deg, 360.*deg) ;    
   else                  coreS = new G4Box  ("coreS", core_radius, core_radius, 0.5*fibre_length) ;    
   G4LogicalVolume* coreLV = new G4LogicalVolume (coreS, CoMaterial, "coreLV");
-  if (crystal_conf == 0)
+  G4PVPlacement* corePV;
+  G4PVPlacement* corePV_ref;
+  if (crystal_conf != 1)
   {
-    new G4PVPlacement(0, G4ThreeVector(0.,0,0.), coreLV, "corePV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement(0, G4ThreeVector(0.,0,cryst_dist + fibre_length), coreLV, "corePV_ref", worldLV, false, 0, checkOverlaps) ;
+    corePV = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), coreLV, "corePV", worldLV, false, 0, checkOverlaps) ;
+    if (ref_crys == 1) corePV_ref = new G4PVPlacement(0, G4ThreeVector(0.,0,cryst_dist + fibre_length), coreLV, "corePV_ref", worldLV, false, 0, checkOverlaps) ;
   }
   
   else if (crystal_conf == 1)
   {
-    new G4PVPlacement(0, G4ThreeVector(0.,core_radius*1 + cryst_dist*0.5,0.), coreLV, "corePV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement(0, G4ThreeVector(0.,-core_radius*1 - cryst_dist*0.5,0.), coreLV, "corePV_ref", worldLV, false, 0, checkOverlaps) ;
+    corePV = new G4PVPlacement(0, G4ThreeVector(0.,core_radius*1 + cryst_dist*0.5,0.), coreLV, "corePV", worldLV, false, 0, checkOverlaps) ;
+    if (ref_crys == 1) corePV_ref = new G4PVPlacement(0, G4ThreeVector(0.,-core_radius*1 - cryst_dist*0.5,0.), coreLV, "corePV_ref", worldLV, false, 0, checkOverlaps) ;
   }
   
   // the capillary
@@ -199,15 +211,15 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
       capillaryS = new G4SubtractionSolid ("capillaryS", dummyS, subS);    
     }
     capillaryLV = new G4LogicalVolume (capillaryS, CaMaterial, "capillaryLV") ;
-    if (crystal_conf == 0)
+    if (crystal_conf != 1)
     {
       new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), capillaryLV, "capillaryPV", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist + fibre_length), capillaryLV, "capillaryPV_ref", worldLV, false, 0, checkOverlaps) ;
+      if (ref_crys == 1) new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist + fibre_length), capillaryLV, "capillaryPV_ref", worldLV, false, 0, checkOverlaps) ;
     }
     else if (crystal_conf == 1)
     {
       new G4PVPlacement(0, G4ThreeVector(0.,core_radius*1 + cryst_dist*0.5,0.), capillaryLV, "capillaryPV", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement(0, G4ThreeVector(0.,-core_radius*1 - cryst_dist*0.5,0.), capillaryLV, "capillaryPV_ref", worldLV, false, 0, checkOverlaps) ;
+      if (ref_crys == 1) new G4PVPlacement(0, G4ThreeVector(0.,-core_radius*1 - cryst_dist*0.5,0.), capillaryLV, "capillaryPV_ref", worldLV, false, 0, checkOverlaps) ;
     }
       
   }
@@ -226,15 +238,15 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
       claddingS = new G4SubtractionSolid ("claddingS", dummyS, subS);
     }
     claddingLV = new G4LogicalVolume (claddingS, ClMaterial, "claddingLV") ;  
-    if (crystal_conf == 0)
+    if (crystal_conf != 1)
     {    
       new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), claddingLV, "claddingPV", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist + fibre_length), claddingLV, "claddingPV_ref", worldLV, false, 0, checkOverlaps) ;
+      if (ref_crys == 1) new G4PVPlacement(0, G4ThreeVector(0.,0.,cryst_dist + fibre_length), claddingLV, "claddingPV_ref", worldLV, false, 0, checkOverlaps) ;
     }
     else if (crystal_conf == 1)
     {
       new G4PVPlacement(0, G4ThreeVector(0.,core_radius*1 + cryst_dist*0.5,0.), claddingLV, "claddingPV", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement(0, G4ThreeVector(0.,-core_radius*1 - cryst_dist*0.5,0.), claddingLV, "claddingPV_ref", worldLV, false, 0, checkOverlaps) ;
+      if (ref_crys == 1) new G4PVPlacement(0, G4ThreeVector(0.,-core_radius*1 - cryst_dist*0.5,0.), claddingLV, "claddingPV_ref", worldLV, false, 0, checkOverlaps) ;
     }  
     
   }
@@ -268,14 +280,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
     G4VSolid* dummyS = new G4Box ("dummyS", total_radius+lat_gap+depth, total_radius+lat_gap+depth, 0.5*fibre_length) ;
     latGapS = new G4SubtractionSolid ("latGapS", dummyS, totalDepthS);
   }
-
+/*
   G4LogicalVolume* latGapLayerLV = new G4LogicalVolume (latGapLayerS, GaMaterial, "latGapLayerLV") ;
-  G4LogicalVolume* latGapLV      = new G4LogicalVolume (latGapS,      GaMaterial,      "latGapLV") ;
+  G4LogicalVolume* latGapLV      = new G4LogicalVolume (latGapS,      GaMaterial,      "latGapLV") ;*/
 
-//  G4LogicalVolume* latGapLayerLV = new G4LogicalVolume (latGapLayerS, MyMaterials::Air(), "latGapLayerLV") ;
-//  G4LogicalVolume* latGapLV      = new G4LogicalVolume (latGapS,      MyMaterials::Air(),      "latGapLV") ;
+  G4LogicalVolume* latGapLayerLV = new G4LogicalVolume (latGapLayerS, MyMaterials::Air(), "latGapLayerLV") ;
+  G4LogicalVolume* latGapLV      = new G4LogicalVolume (latGapS,      MyMaterials::Air(),      "latGapLV") ;
   
-  if (crystal_conf == 0)
+  if (crystal_conf != 1)
   {
 //    new G4PVPlacement (0, G4ThreeVector (0., 0., 0.), latGapLayerLV, "latGapLayerPV", worldLV, false, 0, checkOverlaps) ;
 //    new G4PVPlacement (0, G4ThreeVector (0., 0., 0.),      latGapLV,      "latGapPV", worldLV, false, 0, checkOverlaps) ;
@@ -294,31 +306,91 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   
   //end gaps
   G4VSolid* gapLayerS;
-  if( !fibre_isSquare ) gapLayerS = new G4Tubs ("gapLayerS", 0., total_radius, 0.5*depth, 0.*deg, 360.*deg) ;
-  else                  gapLayerS = new G4Box  ("gapLayerS", core_radius, core_radius, 0.5*depth) ;
-  
   G4VSolid* gapS;
-  if( !fibre_isSquare ) gapS      = new G4Tubs (     "gapS", 0., total_radius, 0.5*(gap_l-depth), 0.*deg, 360.*deg) ;
-  else                  gapS      = new G4Box  (     "gapS", core_radius, core_radius, 0.5*(gap_l-depth)) ;
+  if (gap_size == -1)
+  {
+	if( !fibre_isSquare ) gapLayerS = new G4Tubs ("gapLayerS", 0., total_radius, 0.5*depth, 0.*deg, 360.*deg) ;
+  	else                  gapLayerS = new G4Box  ("gapLayerS", core_radius, core_radius, 0.5*depth) ;
+  	if( !fibre_isSquare ) gapS      = new G4Tubs (     "gapS", 0., total_radius, 0.5*(gap_l-depth), 0.*deg, 360.*deg) ;
+	else                  gapS      = new G4Box  (     "gapS", core_radius, core_radius, 0.5*(gap_l-depth)) ;
+  }
+  else
+  {
+	if( !fibre_isSquare ) gapLayerS = new G4Tubs ("gapLayerS", 0., gap_size*0.5, 0.5*depth, 0.*deg, 360.*deg) ;
+  	else                  gapLayerS = new G4Box  ("gapLayerS", gap_size*0.5, gap_size*0.5, 0.5*depth) ;
+  	if( !fibre_isSquare ) gapS      = new G4Tubs (     "gapS", 0., gap_size*0.5, 0.5*(gap_l-depth), 0.*deg, 360.*deg) ;
+  	else                  gapS      = new G4Box  (     "gapS", gap_size*0.5, gap_size*0.5, 0.5*(gap_l-depth)) ;
+  }
+	
   
+  G4RotationMatrix* piRot = new G4RotationMatrix;
+  double theta = M_PI/4.*rad;
+  double phi = 0;
+  piRot->rotateZ(theta);
+//  piRot->rotateX(phi);
+
   G4LogicalVolume* gapLayerLV = new G4LogicalVolume (gapLayerS, GaMaterial, "gapLayerLV") ;
   G4LogicalVolume* gapLV      = new G4LogicalVolume (gapS,      GaMaterial,      "gapLV") ;
   
-  if (crystal_conf == 0)
+  if (crystal_conf == 0)	//aligned longitudinally
   {
     new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV", worldLV, false, 0, checkOverlaps) ;
     new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      "gapPV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+0.5*depth + fibre_length),          gapLayerLV, "gapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+depth+0.5*(gap_l-depth) + fibre_length), gapLV,      "gapPV_ref", worldLV, false, 0, checkOverlaps) ;
+    if (ref_crys == 1)
+    {
+      new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+0.5*depth + fibre_length),          gapLayerLV, "gapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+depth+0.5*(gap_l-depth) + fibre_length), gapLV,      "gapPV_ref", worldLV, false, 0, checkOverlaps) ;
+    }
   }
   
-  else if (crystal_conf == 1)
+  else if (crystal_conf == 1)	//side-to-side
   {
     new G4PVPlacement (0, G4ThreeVector (0., core_radius*1 + cryst_dist*0.5, 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV", worldLV, false, 0, checkOverlaps) ;
     new G4PVPlacement (0, G4ThreeVector (0., core_radius*1 + cryst_dist*0.5, 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      "gapPV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., -core_radius*1 - cryst_dist*0.5, 0.5*fibre_length+0.5*depth),          gapLayerLV, "gapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., -core_radius*1 - cryst_dist*0.5, 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      "gapPV_ref", worldLV, false, 0, checkOverlaps) ;
+    if (ref_crys == 1)
+    {
+      new G4PVPlacement (0, G4ThreeVector (0., -core_radius*1 - cryst_dist*0.5, 0.5*fibre_length+0.5*depth),          gapLayerLV, "gapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector (0., -core_radius*1 - cryst_dist*0.5, 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      "gapPV_ref", worldLV, false, 0, checkOverlaps) ;
+    }
   }
+  else if (crystal_conf == 2)	//aligned longitudinally with tilted SiPM
+  {
+    new G4PVPlacement (piRot, G4ThreeVector (0., 0., 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement (piRot, G4ThreeVector (0., 0., 0.5*fibre_length+depth+0.5*(gap_l-depth)),  gapLV,      "gapPV", worldLV, false, 0, checkOverlaps) ;    
+  }
+  else if (crystal_conf > 2)	//multi SiPMs - 5 in one
+  {
+	int   lines   = sqrt(crystal_conf);
+	float spacing = det_size;
+	float offset  = -core_radius; 
+	
+	for (int iDet = 0; iDet < crystal_conf; iDet++)
+	{
+	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing + det_size)*(iDet%lines +1), offset + (spacing + det_size)*(iDet/lines +1), 0.5*fibre_length+0.5*depth), gapLayerLV, Form("gapLayerPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
+	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing + det_size)*(iDet%lines +1), offset + (spacing + det_size)*(iDet/lines +1), 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      Form("gapPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
+	}
+  }
+
+/*
+	//central 
+    new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+depth+0.5*(gap_l-depth)),  gapLV,      "gapPV", worldLV, false, 0, checkOverlaps) ;
+	//corners 
+		//bot left
+    new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV_1", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+depth+0.5*(gap_l-depth)),  gapLV,      "gapPV_1", worldLV, false, 0, checkOverlaps) ;
+		//bot right
+    new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV_2", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+depth+0.5*(gap_l-depth)),  gapLV,      "gapPV_2", worldLV, false, 0, checkOverlaps) ;
+		//top left
+    new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV_3", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+depth+0.5*(gap_l-depth)),  gapLV,      "gapPV_3", worldLV, false, 0, checkOverlaps) ;
+		//top right
+    new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV_4", worldLV, false, 0, checkOverlaps) ;
+    new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+depth+0.5*(gap_l-depth)),  gapLV,      "gapPV_4", worldLV, false, 0, checkOverlaps) ;
+*/
+
+
   
 
   
@@ -330,31 +402,135 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   G4LogicalVolume * detLV      = NULL;
   if( detector )
   {
-    detLayerS = new G4Box ("detLayerS", core_radius*mm, core_radius*mm, 0.5*depth) ;
-    detS      = new G4Box (     "detS", core_radius*mm, core_radius*mm, 0.5*(det_l-depth)) ;
+    if (det_size == -1)
+    {
+      detLayerS = new G4Box ("detLayerS", core_radius*mm, core_radius*mm, 0.5*depth) ;
+      detS      = new G4Box (     "detS", core_radius*mm, core_radius*mm, 0.5*(det_l-depth)) ;
+    }
+    else
+    {
+      detLayerS = new G4Box ("detLayerS", det_size*0.5, det_size*0.5, 0.5*depth) ;
+      detS      = new G4Box (     "detS", det_size*0.5, det_size*0.5, 0.5*(det_l-depth)) ;
+    }
+
     detLayerLV = new G4LogicalVolume (detLayerS, DeMaterial, "detLayerLV") ;
     detLV      = new G4LogicalVolume (detS,      DeMaterial,      "detLV") ;
     
-  //for standard conf
-  if (crystal_conf == 0)
-  {
-    new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
+    //for standard conf
+    if (crystal_conf == 0)
+    {
+      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
+      if (ref_crys == 1)
+      {
+        new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+0.5*depth + fibre_length),          detLayerLV, "detLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+        new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth) + fibre_length), detLV,      "detPV_ref", worldLV, false, 0, checkOverlaps) ;
+      }
+    }
+    else if (crystal_conf == 1)
+    {
+      new G4PVPlacement (0, G4ThreeVector (0., core_radius*1 + cryst_dist*0.5, 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector (0., core_radius*1 + cryst_dist*0.5, 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
     
-    new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+0.5*depth + fibre_length),          detLayerLV, "detLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth) + fibre_length), detLV,      "detPV_ref", worldLV, false, 0, checkOverlaps) ;
+      if (ref_crys == 1)
+      {
+          new G4PVPlacement (0, G4ThreeVector (0., -core_radius*1 - cryst_dist*0.5, 0.5*fibre_length+gap_l+0.5*depth ),          detLayerLV, "detLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+          new G4PVPlacement (0, G4ThreeVector (0., -core_radius*1 - cryst_dist*0.5, 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth) ), detLV,      "detPV_ref", worldLV, false, 0, checkOverlaps) ;
+      }
+    }    
+    else if (crystal_conf == 2)
+    {
+      new G4PVPlacement (piRot, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (piRot, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
+    }
+   else if (crystal_conf > 2)	//multi SiPMs - 5 in one
+   {
+	int   lines   = sqrt(crystal_conf);
+	float spacing = det_size;
+	float offset  = -core_radius; 
+	
+	for (int iDet = 0; iDet < crystal_conf; iDet++)
+	{
+	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing + det_size)*(iDet%lines +1), offset + (spacing + det_size)*(iDet/lines +1), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, Form("detLayerPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
+	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing + det_size)*(iDet%lines +1), offset + (spacing + det_size)*(iDet/lines +1), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      Form("detPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
+	}
+/*
+	//central 
+      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
+	//corners 
+		//bot left
+      new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_1", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_1", worldLV, false, 0, checkOverlaps) ;
+		//bot right
+      new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_2", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_2", worldLV, false, 0, checkOverlaps) ;
+		//top left
+      new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_3", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_3", worldLV, false, 0, checkOverlaps) ;
+		//top right
+      new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_4", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_4", worldLV, false, 0, checkOverlaps) ;
+*/
+   }
   }
-  else if (crystal_conf == 1)
-  {
-    new G4PVPlacement (0, G4ThreeVector (0., core_radius*1 + cryst_dist*0.5, 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., core_radius*1 + cryst_dist*0.5, 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
-    
-    new G4PVPlacement (0, G4ThreeVector (0., -core_radius*1 - cryst_dist*0.5, 0.5*fibre_length+gap_l+0.5*depth ),          detLayerLV, "detLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., -core_radius*1 - cryst_dist*0.5, 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth) ), detLV,      "detPV_ref", worldLV, false, 0, checkOverlaps) ;
-  }
-    
 
-  }
+   //SURFACE STATE IMPLEMENTATION
+
+   //front face surface state (opposite to photodetector)
+   G4Box* Front_skin 			= new G4Box("Front_skin", core_radius, core_radius, 0.5*depth);
+   G4LogicalVolume* Front_skin_log 	= new G4LogicalVolume(Front_skin, MyMaterials::Air(), "Front_skin_log", 0, 0, 0);
+//   G4VPhysicalVolume* Front_skin_phys 	= new G4PVPlacement(0, G4ThreeVector(0., 0., -(0.5*fibre_length+0.5*depth)) , Front_skin_log, "Front_skin_phys", worldLV, false, 0);
+
+   //side surface state
+   G4VSolid* dummySk = new G4Box ("dummySk", core_radius+depth, core_radius+depth, 0.5*fibre_length) ;
+   G4VSolid* subSk   = new G4Box ("subSk", core_radius, core_radius, 0.51*fibre_length);
+   
+   G4SubtractionSolid* Side_skin 	= new G4SubtractionSolid("Side_skin", dummySk, subSk);				
+   G4LogicalVolume* Side_skin_log 	= new G4LogicalVolume(Side_skin, MyMaterials::Air(), "Side_skin_log", 0, 0, 0);
+  // G4VPhysicalVolume* Side_skin_phys 	= new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), Side_skin_log, "Side_skin_phys", worldLV, false, 0);
+
+   G4LogicalBorderSurface *CrystalFrontSkin   	= NULL;
+   G4LogicalBorderSurface *CrystalSideSkin   	= NULL;
+   G4OpticalSurface *OpCrystalSurface		= NULL;
+	
+   ///-------CRYSTAL SURFACE-------
+   OpCrystalSurface = new G4OpticalSurface("crystal");
+   OpCrystalSurface->SetType(dielectric_dielectric);
+   OpCrystalSurface->SetModel(unified);
+/*
+   // depolished surface
+//   OpCrystalSurface->SetFinish(ground);	
+//   OpCrystalSurface->SetSigmaAlpha(0.4);
+
+   //polished + wrapped surface
+   OpCrystalSurface->SetFinish(polishedbackpainted);
+
+	const G4int NUM = 2;
+	G4double pp[NUM] = {2.038*eV, 4.144*eV};
+	G4double specularlobe[NUM] = {0.3, 0.3};
+	G4double specularspike[NUM] = {0.2, 0.2};
+	G4double backscatter[NUM] = {0.1, 0.1};
+	G4double rindex[NUM] = {1.3, 1.4};		//index of refraction of Teflon
+	G4double reflectivity[NUM] = {0.99, 0.99};	//only used in case of dieletric_metal interface --> otherwise it uses Fresnel reflection
+	G4double efficiency[NUM] = {1., 1.};
+
+   	G4MaterialPropertiesTable *SMPT = new G4MaterialPropertiesTable();
+	SMPT -> AddProperty("RINDEX", pp, rindex, NUM);
+	SMPT -> AddProperty("SPECULARLOBECONSTANT",pp,	specularlobe,NUM);
+	SMPT -> AddProperty("SPECULARSPIKECONSTANT",pp,specularspike,NUM);
+	SMPT -> AddProperty("BACKSCATTERCONSTANT",pp,backscatter,NUM);
+	SMPT -> AddProperty("REFLECTIVITY",pp,reflectivity,NUM);
+	SMPT -> AddProperty("EFFICIENCY",pp,efficiency,NUM);
+	OpCrystalSurface -> SetMaterialPropertiesTable(SMPT);
+	
+//   initializeSurface(OpCrystalSurface, "crystal");
+//   initializeReflectivitySurface(OpCrystalSurface, "crystal");
+
+   CrystalFrontSkin   = new G4LogicalBorderSurface("Front", corePV, Front_skin_phys, OpCrystalSurface);
+   CrystalSideSkin    = new G4LogicalBorderSurface("Side", corePV, Side_skin_phys, OpCrystalSurface);
+
+   */
   
   
   
@@ -494,14 +670,25 @@ void DetectorConstruction::initializeMaterials ()
   
   
   CoMaterial = NULL ;
-  if      ( core_material == 1 ) CoMaterial = MyMaterials::Quartz();
-  else if ( core_material == 2 ) CoMaterial = MyMaterials::SiO2();
-  else if ( core_material == 3 ) CoMaterial = MyMaterials::SiO2_Ce();
-  else if ( core_material == 4 ) CoMaterial = MyMaterials::DSB_Ce();
-  else if ( core_material == 5 ) CoMaterial = MyMaterials::LuAG_Ce();
-  else if ( core_material == 6 ) CoMaterial = MyMaterials::YAG_Ce();
-  else if ( core_material == 7 ) CoMaterial = MyMaterials::LSO();
-  else if ( core_material == 8 ) CoMaterial = MyMaterials::LYSO();
+  if      ( core_material == 1 )  CoMaterial = MyMaterials::Quartz();
+  else if ( core_material == 2 )  CoMaterial = MyMaterials::SiO2();
+  else if ( core_material == 3 )  CoMaterial = MyMaterials::SiO2_Ce();
+  else if ( core_material == 4 )  CoMaterial = MyMaterials::DSB_Ce();
+  else if ( core_material == 5 )  CoMaterial = MyMaterials::LuAG_Ce();
+  else if ( core_material == 6 )  CoMaterial = MyMaterials::YAG_Ce();
+  else if ( core_material == 7 )  CoMaterial = MyMaterials::LSO();
+  else if ( core_material == 8 )  CoMaterial = MyMaterials::LYSO();
+  else if ( core_material == 9 )  CoMaterial = MyMaterials::LuAG_undoped();
+  else if ( core_material == 11 ) CoMaterial = MyMaterials::GAGG_Ce();
+  else if ( core_material == 12 ) CoMaterial = MyMaterials::GAGG_Ce_Mg();
+  else if ( core_material == 13 ) CoMaterial = MyMaterials::YAG_Ce_Mg();
+  else if ( core_material == 14 ) CoMaterial = MyMaterials::LuAG_Ce_Mg();
+  else if ( core_material == 15 ) CoMaterial = MyMaterials::LuAG_Pr();
+  else if ( core_material == 16 ) CoMaterial = MyMaterials::AFO_Ce();
+  else if ( core_material == 17 ) CoMaterial = MyMaterials::AFO_undoped();
+  else if ( core_material == 18 ) CoMaterial = MyMaterials::PbF2();
+  else if ( core_material == 19 ) CoMaterial = MyMaterials::ZnO_PS();
+  else if ( core_material == 0 )  CoMaterial = MyMaterials::ToyLSO(toy_ly, toy_decay, toy_rise);
   else
   {
     G4cerr << "<DetectorConstructioninitializeMaterials>: Invalid fibre clad material specifier " << core_material << G4endl ;
@@ -547,6 +734,8 @@ void DetectorConstruction::initializeMaterials ()
   GaMaterial = NULL;
   if     ( gap_material == 1 ) GaMaterial = MyMaterials::Air();
   else if( gap_material == 2 ) GaMaterial = MyMaterials::OpticalGrease();
+  else if( gap_material == 3 ) GaMaterial = MyMaterials::MeltMount168();
+  else if( gap_material == 4 ) GaMaterial = MyMaterials::OpticalGrease155();
   else
   {
     G4cerr << "<DetectorConstructioninitializeMaterials>: Invalid gap material specifier " << gap_material << G4endl;
@@ -665,6 +854,171 @@ void DetectorConstruction::SetMaxStep(G4double maxStep)
 {
   if ((stepLimit)&&(maxStep>0.)) stepLimit->SetMaxAllowedStep(maxStep);
 }
+
+
+// Initialization classes
+//
+/*
+void DetectorConstruction::initializeSurface(G4OpticalSurface *mySurface, string surfaceType)
+{
+    if(surfaceType == "crystal") 
+    {
+//         cout << "CRISTALLO " << crystalSurfinish << endl;
+
+        surfinish   	= crystalSurfinish;
+        RefFile     	= cReffile;
+        reflectivity    = cReflectivity;
+        surrefind   	= cSurrefind;
+        surtype     	= cSurtype;
+        specularspike   = cSpecularspike;
+        specularlobe    = cSpecularlobe;
+        sigmaalpha  	= cSigmaalpha;
+        backscatter     = cBackscatter;
+        lambertian  	= cLambertian;
+    }
+
+
+
+    if(this->surfinish <= 5)
+    {
+        G4cout << "Using unified model." << G4endl;
+        mySurface -> SetModel(unified);
+        switch(this->surtype) {
+        case 0:
+            mySurface -> SetType(dielectric_metal);
+            G4cout << "Surface type: dielectric_metal" << G4endl;
+            break;
+        case 1:
+            mySurface -> SetType(dielectric_dielectric);
+            G4cout << "Surface type: dielectric_dielectric" << G4endl;
+            break;
+        }
+    }
+
+    else if(this->surfinish > 5 && surfaceType == "wrapping") G4cout << "Value not allowed" << G4endl;
+
+    else {
+        G4cout << "Using LUT for surface treatment." << G4endl;
+        mySurface -> SetModel(LUT);
+        mySurface -> SetType(dielectric_LUT);
+    }
+
+    switch(this->surfinish) {
+    case 0:
+        mySurface -> SetFinish(polished);
+        G4cout << "Surface finish: polished" << G4endl;
+        break;
+    case 1:
+        mySurface -> SetFinish(polishedfrontpainted);
+        G4cout << "Surface finish: polishedfrontpainted" << G4endl;
+        break;
+    case 2:
+        mySurface -> SetFinish(polishedbackpainted);
+        G4cout << "Surface finish: polishedbackpainted" << G4endl;
+        break;
+    case 3:
+        mySurface -> SetFinish(ground);
+        G4cout << "Surface finish: ground" << G4endl;
+        break;
+    case 4:
+        mySurface -> SetFinish(groundfrontpainted);
+        G4cout << "Surface finish: groundfrontpainted" << G4endl;
+        break;
+    case 5:
+        mySurface -> SetFinish(groundbackpainted);
+        G4cout << "Surface finish: groundbackpainted" << G4endl;
+        break;
+    case 17:
+        mySurface -> SetFinish(polishedteflonair);
+        G4cout << "Surface finish: polishedteflonair" << G4endl;
+        break;
+    case 18:
+        mySurface -> SetFinish(polishedtioair);
+        G4cout << "Surface finish: polishedtioair" << G4endl;
+        break;
+    case 26:
+        mySurface -> SetFinish(etchedtioair);
+        G4cout << "Surface finish: etchedtioair" << G4endl;
+        break;
+    case 34:
+        mySurface -> SetFinish(groundtioair);
+        G4cout << "Surface finish: groundtioair" << G4endl;
+        break;
+    case 36:
+        mySurface -> SetFinish(polishedtyvekair);
+        G4cout << "Surface finish: polishedtyvekair" << G4endl;
+        break;
+    default:
+        G4cout << "Surface finish unkown!" << G4endl;
+        exit(0);
+    }
+}*/
+
+
+//
+// reflectivity
+//
+/*
+void DetectorConstruction::initializeReflectivitySurface(G4OpticalSurface *surface, string surfaceType)
+{
+
+    int NumRefl = 0;
+    G4double EphotonRefl[1000];
+    G4double Refl[1000];
+    
+    EphotonRefl[0] = 0.0001 * eV;
+    EphotonRefl[1] = 1.0 * eV;
+    EphotonRefl[2] = 4.08 * eV;
+    Refl[0] = 0.0; // suppress photons with energy < 1eV (will not be detected)
+    Refl[1] = this->crystal_reflectivity;
+    Refl[2] = this->crystal_reflectivity;
+    NumRefl = 100;
+
+    G4cout << "Reflectivities as a function of the photon energy:" << G4endl;
+    for(int i = 0; i < NumRefl; i++)         G4cout << i << "   " << EphotonRefl[i] << "   " << Refl[i] << G4endl;
+    
+
+    Ephoton[0] = 0.0001 * eV;
+    Ephoton[1] = 1.0 * eV;
+    Ephoton[2] = 4.08 * eV;
+    G4double RefractiveIndex[3] = {this->surrefind, this->surrefind, this->surrefind};
+    G4double SpecularLobe[3]    = {this->specularlobe, this->specularlobe, this->specularlobe};
+    G4double SpecularSpike[3]   = {this->specularspike, this->specularspike, this->specularspike};
+    G4double Backscatter[3]     = {this->backscatter, this->backscatter, this->backscatter};
+    G4double Lambertian[3]      = {this->lambertian, this->lambertian, this->lambertian};
+    G4MaterialPropertiesTable *myST = new G4MaterialPropertiesTable();
+    G4cout << "Read from config-file: " << G4endl;
+    G4cout << "Read SPECULARLOBECONSTANT  : " << SpecularLobe[0] << G4endl;
+    G4cout << "Read SPECULARSPIKECONSTANT : " << SpecularSpike[0] << G4endl;
+    G4cout << "Read BACKSCATTERCONSTANT   : " << Backscatter[0] << G4endl;
+    G4cout << "Read LAMBERTIAN            : " << Lambertian[0] << G4endl;
+    G4cout << "Read ref. index            : " << RefractiveIndex[0] << G4endl;
+
+    myST->AddProperty("RINDEX", Ephoton, RefractiveIndex, 3);
+    if(this->specularlobe >= 0) {
+        G4cout << "Setting SPECULARLOBECONSTANT to : " << SpecularLobe[0] << G4endl;
+        myST->AddProperty("SPECULARLOBECONSTANT",  Ephoton, SpecularLobe,    3);
+    }
+    if(this->specularspike >= 0) {
+        G4cout << "Setting SPECULARSPIKECONSTANT to : " << SpecularSpike[0] << G4endl;
+        myST->AddProperty("SPECULARSPIKECONSTANT", Ephoton, SpecularSpike,   3);
+    }
+    if(this->backscatter >= 0) {
+        G4cout << "Setting BACKSCATTERCONSTANT to : " << Backscatter[0] << G4endl;
+        myST->AddProperty("BACKSCATTERCONSTANT",   Ephoton, Backscatter,     3);
+    }
+    if(this->lambertian >= 0) {
+        G4cout << "Setting LAMBERTIAN to : " << Lambertian[0] << G4endl;
+        myST->AddProperty("LAMBERTIAN",            Ephoton, Lambertian,      3);
+    }
+
+//     setWrappingIndices(myST,1.82,"teflon");
+
+    surface->SetMaterialPropertiesTable(myST);
+    if(this->sigmaalpha >= 0) surface->SetSigmaAlpha(this->sigmaalpha);
+
+
+}*/
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
