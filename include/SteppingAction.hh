@@ -44,6 +44,9 @@ public:
 
   SteppingAction(DetectorConstruction* detectorConstruction,
                  const G4int& scint, const G4int& cher);
+
+//  SteppingAction(const string& configFileName);
+
   ~SteppingAction();
   virtual void UserSteppingAction(const G4Step*);
   int new_track;
