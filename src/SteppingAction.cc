@@ -1,5 +1,6 @@
 #include "SteppingAction.hh"
 #include "TrackingAction.hh"
+#include "DetectorConstruction.hh"
 #include "TString.h"
 #include "TRandom3.h"
 #include "TCint.h"
@@ -19,6 +20,26 @@
 
 using namespace std;
 using namespace CLHEP;
+/*
+SteppingAction::SteppingAction (const string& configFileName)
+{
+  //---------------------------------------
+  //------------- Parameters --------------
+  //---------------------------------------
+  
+  ConfigFile config (configFileName) ;
+
+  config.readInto(core_material, "core_material"); 
+
+  if (core_material == 0)
+  {
+	  config.readInto(toy_ly,	"toy_ly");
+	  config.readInto(toy_decay,	"toy_decay");
+	  config.readInto(toy_rise,	"toy_rise");
+  }
+  
+
+}*/
 
 
 
@@ -78,8 +99,8 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
   G4int nStep = theTrack -> GetCurrentStepNumber();
   
 //        cout << " step length = " << theStep->GetStepLength() << endl;
-
   //-------------
+ 
   // get position
   G4double global_x = thePrePosition.x()/mm;
   G4double global_y = thePrePosition.y()/mm;
@@ -96,51 +117,43 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
     if( ( theTrack->GetLogicalVolumeAtVertex()->GetName().contains("core") ) &&
         (nStep == 1) && (processName == "Scintillation") )
     {
-      CreateTree::Instance()->tot_phot_sci += 1;
+
 //       cout << " in log volume " << endl;
       //save only prompt photons
-      if (thePrePoint->GetGlobalTime()/picosecond>1000) theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+      if (thePrePoint->GetGlobalTime()/picosecond>2500) 	theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+
       else if (thePrePVName == "corePV") 
       {
-//	CreateTree::Instance()->time_prod_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
-//	CreateTree::Instance()->lambda_prod_scint.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+	CreateTree::Instance()->tot_phot_sci += 1;
+//	CreateTree::Instance()->h_phot_sci_time   -> Fill( thePrePoint->GetGlobalTime()/ns );	//***ATTENTION** error: in previous ntuple the time was in ns!
+	CreateTree::Instance()->h_phot_sci_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+	CreateTree::Instance()->h_phot_sci_angleAtProduction -> Fill( G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection) *57.2958);
+        CreateTree::Instance()->h_phot_sci_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
       }
-      else if (thePrePVName == "corePV_ref") 
-      {
-//	CreateTree::Instance()->time_prod_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
-//	CreateTree::Instance()->lambda_prod_scint_ref.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
-      }
-      
-      if( !propagateScintillation ) theTrack->SetTrackStatus(fKillTrackAndSecondaries);
-      
-//      CreateTree::Instance()->h_phot_sci_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
-//      CreateTree::Instance()->h_phot_sci_E      -> Fill( theTrack->GetTotalEnergy()/eV );
-//      CreateTree::Instance()->h_phot_sci_time   -> Fill( thePrePoint->GetGlobalTime()/ns );
-//      CreateTree::Instance()->h_phot_sci_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
+           
+      if( !propagateScintillation ) theTrack->SetTrackStatus(fKillTrackAndSecondaries);      
+
     }
     
         
     if( ( theTrack->GetLogicalVolumeAtVertex()->GetName().contains("core")) &&
         (nStep == 1) && (processName == "Cerenkov") )
     {
-      CreateTree::Instance()->tot_phot_cer += 1;
-      if (thePrePVName == "corePV")
-      {
+      //kill very long wavelengths
+      if (MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) > 1200)  theTrack->SetTrackStatus(fKillTrackAndSecondaries); 
+      else if (thePrePVName == "corePV" && MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) < 1200)
+      {      
+	CreateTree::Instance()->tot_phot_cer += 1;
+        CreateTree::Instance()->h_phot_cer_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+        CreateTree::Instance()->h_phot_cer_angleAtProduction -> Fill( G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)*57.2958 );
+        CreateTree::Instance()->h_phot_cer_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+
 //	CreateTree::Instance()->time_prod_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
 //	CreateTree::Instance()->lambda_prod_cher.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
       }
-      else if (thePrePVName == "corePV_ref")
-      {
-//	CreateTree::Instance()->time_prod_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
-//	CreateTree::Instance()->lambda_prod_cher_ref.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
-      }
 
       if( !propagateCerenkov ) theTrack->SetTrackStatus(fKillTrackAndSecondaries);      
-      
-//      CreateTree::Instance()->h_phot_cer_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
-//      CreateTree::Instance()->h_phot_cer_E      -> Fill( theTrack->GetTotalEnergy()/eV );
-//      CreateTree::Instance()->h_phot_cer_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
-//      CreateTree::Instance()->h_phot_cer_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
+
     }
     
     
@@ -158,8 +171,8 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       CreateTree::Instance()->h_phot_sci_latGap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
 //       CreateTree::Instance()->h_phot_sci_latGap_E      -> Fill( theTrack->GetTotalEnergy()/eV );
       CreateTree::Instance()->h_phot_sci_latGap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
-//       CreateTree::Instance()->h_phot_sci_latGap_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
-//       CreateTree::Instance()->h_phot_sci_latGap_angleWithSurfNormal -> Fill( cos(thePreS->SurfaceNormal(thePrePosition).angle(theTrackDirection)) );
+//       CreateTree::Instance()->h_phot_sci_latGap_angleAtProduction -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
+//       CreateTree::Instance()->h_phot_sci_latGap_angleWithSurfNormal -> Fill( (thePreS->SurfaceNormal(thePrePosition).angle(theTrackDirection)) );
     }
     
     if( ( theTrack->GetLogicalVolumeAtVertex()->GetName().contains("core") ||
@@ -175,8 +188,8 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       CreateTree::Instance()->h_phot_cer_latGap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
 //       CreateTree::Instance()->h_phot_cer_latGap_E      -> Fill( theTrack->GetTotalEnergy()/eV );
       CreateTree::Instance()->h_phot_cer_latGap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
-//       CreateTree::Instance()->h_phot_cer_latGap_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
-//       CreateTree::Instance()->h_phot_cer_latGap_angleWithSurfNormal -> Fill( cos(thePreS->SurfaceNormal(thePrePosition).angle(theTrackDirection)) );
+//       CreateTree::Instance()->h_phot_cer_latGap_angleAtProduction -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
+//       CreateTree::Instance()->h_phot_cer_latGap_angleWithSurfNormal -> Fill( (thePreS->SurfaceNormal(thePrePosition).angle(theTrackDirection)) );
     }*/
     
     
@@ -184,48 +197,49 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
     //----------------------------
     // count photons at fiber exit
     
-    if( ( theTrack->GetLogicalVolumeAtVertex()->GetName().contains("core") ) &&
-        (processName == "Scintillation") &&
-        ((thePrePVName == "gapLayerPV") && (thePostPVName == "gapPV") || (thePrePVName == "gapLayerPV_ref") && (thePostPVName == "gapPV_ref")) )
+    if(  theTrack->GetLogicalVolumeAtVertex()->GetName().contains("core")  &&        processName == "Scintillation"  &&
+        ((thePrePVName.contains("gapLayerPV") && thePostPVName.contains("gapPV")) || (thePrePVName.contains("gapLayerPV_ref") && thePostPVName.contains("gapPV_ref"))) )
     {
       CreateTree::Instance()->tot_gap_phot_sci += 1;
-      if (thePrePVName == "gapLayerPV") 
+      if (thePrePVName.contains("gapLayerPV")) 
       {
 	CreateTree::Instance()->time_ext_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
 //	CreateTree::Instance()->lambda_ext_scint.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+
+       CreateTree::Instance()->h_phot_sci_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+       CreateTree::Instance()->h_phot_sci_gap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+       CreateTree::Instance()->h_phot_sci_gap_angleAtProduction -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection))*57.2958 );
+       CreateTree::Instance()->h_phot_sci_gap_angleWithSurfNormal -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackDirection))*57.2958 );
       }
-      else if (thePrePVName == "gapLayerPV_ref") CreateTree::Instance()->time_ext_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
+//      else if (thePrePVName == "gapLayerPV_ref") CreateTree::Instance()->time_ext_scint_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
       // if you do not want to kill a photon once it exits the fiber, comment here below
-      theTrack->SetTrackStatus(fKillTrackAndSecondaries);      
-//       CreateTree::Instance()->h_phot_sci_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
-//       CreateTree::Instance()->h_phot_sci_gap_E      -> Fill( theTrack->GetTotalEnergy()/eV );
-//       CreateTree::Instance()->h_phot_sci_gap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
-//       CreateTree::Instance()->h_phot_sci_gap_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
-//       CreateTree::Instance()->h_phot_sci_gap_angleWithSurfNormal -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackDirection)) );
+//      theTrack->SetTrackStatus(fKillTrackAndSecondaries);      
     }
     
     if( ( theTrack->GetLogicalVolumeAtVertex()->GetName().contains("core") ||
           theTrack->GetLogicalVolumeAtVertex()->GetName().contains("capillary") ||
           theTrack->GetLogicalVolumeAtVertex()->GetName().contains("cladding") ) &&
         (processName == "Cerenkov") &&
-        ((thePrePVName == "gapLayerPV" && thePostPVName == "gapPV") || (thePrePVName == "gapLayerPV_ref" && thePostPVName == "gapPV_ref")))
+        ( (thePrePVName.contains("gapLayerPV") && thePostPVName.contains("gapPV")) || (thePrePVName.contains("gapLayerPV_ref") && thePostPVName.contains("gapPV_ref")) ) 
+      )
     {
       CreateTree::Instance()->tot_gap_phot_cer += 1;
       // if you do not want to kill a photon once it exits the fiber, comment here below
-      theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+//      theTrack->SetTrackStatus(fKillTrackAndSecondaries);
       
-      if (thePrePVName == "gapLayerPV")
+      if (thePrePVName.contains("gapLayerPV"))
       {
 	CreateTree::Instance()->time_ext_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
 //	CreateTree::Instance()->lambda_ext_cher.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
+
+        CreateTree::Instance()->h_phot_cer_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+        CreateTree::Instance()->h_phot_cer_gap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+        CreateTree::Instance()->h_phot_cer_gap_angleAtProduction -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection))*57.2958 );
+	CreateTree::Instance()->h_phot_cer_gap_angleWithSurfNormal -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackDirection))*57.2958 );
       } 
-      else if (thePrePVName == "gapLayerPV_ref") CreateTree::Instance()->time_ext_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
+//      else if (thePrePVName == "gapLayerPV_ref") CreateTree::Instance()->time_ext_cher_ref.push_back(thePrePoint->GetGlobalTime()/picosecond );
       
-//       CreateTree::Instance()->h_phot_cer_gap_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
-//       CreateTree::Instance()->h_phot_cer_gap_E      -> Fill( theTrack->GetTotalEnergy()/eV );
-//       CreateTree::Instance()->h_phot_cer_gap_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
-//       CreateTree::Instance()->h_phot_cer_gap_angleAtProduction -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection)) );
-//       CreateTree::Instance()->h_phot_cer_gap_angleWithSurfNormal -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackDirection)) );
+
     }
     
    
@@ -236,10 +250,13 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
     
     if( ( theTrack->GetLogicalVolumeAtVertex()->GetName().contains("core") ) &&
         (processName == "Scintillation") &&
-        (thePrePVName == "detLayerPV") && (thePostPVName == "detPV") )
+        (thePrePVName.contains("detLayerPV")) && (thePostPVName.contains("detPV")) )
     {
       CreateTree::Instance()->tot_det_phot_sci += 1;
-//       CreateTree::Instance()->h_phot_sci_det_angleWithSurfNormal -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackDirection)) );
+      CreateTree::Instance()->h_phot_sci_det_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+      CreateTree::Instance()->h_phot_sci_det_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+      CreateTree::Instance()->h_phot_sci_det_angleAtProduction -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection))*57.2958 );
+      CreateTree::Instance()->h_phot_sci_det_angleWithSurfNormal -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackDirection))*57.2958 );
       // if you do not want to kill a photon once it enters the detector, comment here below
       theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
@@ -248,10 +265,15 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
           theTrack->GetLogicalVolumeAtVertex()->GetName().contains("capillary") ||
           theTrack->GetLogicalVolumeAtVertex()->GetName().contains("cladding") ) &&
         (processName == "Cerenkov") &&
-        (thePrePVName == "detLayerPV") && (thePostPVName == "detPV") )
+        (thePrePVName.contains("detLayerPV")) && (thePostPVName.contains("detPV")) )
     {
       CreateTree::Instance()->tot_det_phot_cer += 1;
-//       CreateTree::Instance()->h_phot_cer_det_angleWithSurfNormal -> Fill( cos(G4ThreeVector(0.,0.,1.).angle(theTrackDirection)) );
+
+      CreateTree::Instance()->h_phot_cer_det_lambda -> Fill( MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV) );
+      CreateTree::Instance()->h_phot_cer_det_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
+      CreateTree::Instance()->h_phot_cer_det_angleAtProduction -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection))*57.2958 );
+      CreateTree::Instance()->h_phot_cer_det_angleWithSurfNormal -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackDirection))*57.2958 );
+//    
       // if you do not want to kill a photon once it enters the detector, comment here below
       theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
