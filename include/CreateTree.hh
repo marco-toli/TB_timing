@@ -106,14 +106,19 @@ public:
   TH1F* h_phot_cer_gap_time;
   TH1F* h_phot_cer_gap_angleAtProduction;
   TH1F* h_phot_cer_gap_angleWithSurfNormal;
-  
-  TH1F* h_phot_sci_befgap_angleAtProduction;
-  TH1F* h_phot_cer_befgap_angleAtProduction;
-  
-  TH1F* h_phot_sci_befdet_angleWithSurfNormal;
-  TH1F* h_phot_cer_befdet_angleWithSurfNormal;
+
+  TH1F* h_phot_sci_det_lambda;
+  TH1F* h_phot_sci_det_E;
+  TH1F* h_phot_sci_det_time;
+  TH1F* h_phot_sci_det_angleAtProduction;
   TH1F* h_phot_sci_det_angleWithSurfNormal;
+  TH1F* h_phot_cer_det_lambda;
+  TH1F* h_phot_cer_det_E;
+  TH1F* h_phot_cer_det_time;
+  TH1F* h_phot_cer_det_angleAtProduction;
   TH1F* h_phot_cer_det_angleWithSurfNormal;
+  
+
 };
 
 #endif
