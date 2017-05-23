@@ -109,14 +109,21 @@ private:
   
   G4int    gap_material;
   G4double gap_l;
+  G4double gap_size;
   
   G4int    det_material;
   G4double det_l;
+  G4double det_size;
     
   G4double depth;
   G4double cryst_dist;
   G4double abs_thick;
   G4int crystal_conf;
+  G4int ref_crys;
+
+  G4float toy_ly;
+  G4float toy_decay;
+  G4float toy_rise;
   
   G4UniformMagField* B_field;
   G4bool   B_field_IsInitialized; 
