@@ -31,16 +31,33 @@ public:
   static G4Material* SiO2();
   static G4Material* PlasticO2WLS();
   static G4Material* OpticalGrease();
+  static G4Material* OpticalGrease155();
+  static G4Material* MeltMount168();
   static G4Material* LSO();
   static G4Material* LYSO();
   static G4Material* LYSO_lowLY();
-  static G4Material* LuAG_undoped();
-  static G4Material* LuAG_Ce();
-  static G4Material* LuAG_Pr();
+
+  static G4Material* ToyLSO(float toy_ly, float toy_decay, float toy_rise);
+
   static G4Material* PWO();
   static G4Material* DSB_Ce();
   static G4Material* SiO2_Ce();
+
+  static G4Material* LuAG_undoped();
+  static G4Material* LuAG_Ce();
+  static G4Material* LuAG_Ce_Mg();
+  static G4Material* LuAG_Pr();
+
   static G4Material* YAG_Ce();
+  static G4Material* YAG_Ce_Mg();
+  static G4Material* GAGG_Ce();
+  static G4Material* GAGG_Ce_Mg();
+
+  static G4Material* AFO_Ce();
+  static G4Material* AFO_undoped();
+
+  static G4Material* PbF2();
+  static G4Material* ZnO_PS();
   
   static G4double fromNmToEv(G4double wavelength);
   static G4double fromEvToNm(G4double energy);
