@@ -92,7 +92,8 @@ private:
   G4int    fibre_isSquare;
   G4int    detector;
   
-  G4double core_radius;
+  G4double core_radius_x;
+  G4double core_radius_y;
   G4int    core_material;
   G4double core_rIndex;
   G4double core_absLength;
@@ -109,11 +110,13 @@ private:
   
   G4int    gap_material;
   G4double gap_l;
-  G4double gap_size;
+  G4double gap_size_x;
+  G4double gap_size_y;
   
   G4int    det_material;
   G4double det_l;
-  G4double det_size;
+  G4double det_size_x;
+  G4double det_size_y;
     
   G4double depth;
   G4double cryst_dist;
