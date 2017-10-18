@@ -16,8 +16,8 @@
 #/gps/pos/halfx 0.1 mm
 #/gps/pos/halfy 0.1 mm
 
-/gps/pos/halfx 6 mm
-/gps/pos/halfy 6 mm
+/gps/pos/halfx 5.5 mm
+/gps/pos/halfy 5.5 mm
 
 
 #/gps/pos/halfx 1 mm
@@ -50,4 +50,4 @@
 #/gps/ang/type iso
 
 #/tracking/verbose 1
-/run/beamOn 300
+/run/beamOn 150
