@@ -151,7 +151,7 @@ int main(int argc, char** argv)
 //   cher_PDE  = cher_PDE  *0.7/0.3;
   
   int SPTR = 66;
-  float cell_size = 0.015;	//mm
+  float cell_size = 0.020;	//mm
   
   float cell_rise  = 200;  //ps
   float cell_decay = 10000; //ps
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
   int minTimeDC = -cell_decay*4;    //generating DC earlier as 2 times the recovery time of a cell, to obtain a proper baseline shift
   int maxTimeDC = maxTime;
   
-  float beam_spot = 1.5;  //beam spot selection around tile center in mm
+  float beam_spot = 15;  //beam spot selection around tile center in mm
   
   
   TF1 * funcShapeSiPM = new TF1 ("funcShapeSiPM", shapeSiPM, minTimeDC, maxTime, 5);
@@ -195,7 +195,7 @@ int main(int argc, char** argv)
   float busy_frac[nNoise];
   for (int iNoise = 0; iNoise < nNoise; iNoise++) 
   {
-    busy_frac[iNoise] =  DCounts[iNoise]*(4*cell_decay/1000) / tot_cells / sipm_section; //fraction of busy cells
+    busy_frac[iNoise] =  DCounts[iNoise]*(5*cell_decay/1000) / tot_cells / sipm_section; //fraction of busy cells
     std::cout << "busy_frac [" << iNoise << "] = " << busy_frac[iNoise] << std::endl;
   }
   std::cout << "************************** " << std::endl;
