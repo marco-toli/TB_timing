@@ -203,6 +203,7 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       CreateTree::Instance()->tot_gap_phot_sci += 1;
       if (thePrePVName.contains("gapLayerPV")) 
       {
+	//uncomment line below to count photons at coupling gap
 	CreateTree::Instance()->time_ext_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
 //	CreateTree::Instance()->lambda_ext_scint.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
 
@@ -229,6 +230,7 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       
       if (thePrePVName.contains("gapLayerPV"))
       {
+	//uncomment line below to count photons at coupling gap
 	CreateTree::Instance()->time_ext_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
 //	CreateTree::Instance()->lambda_ext_cher.push_back(MyMaterials::fromEvToNm(theTrack->GetTotalEnergy()/eV));
 
@@ -257,6 +259,8 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       CreateTree::Instance()->h_phot_sci_det_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
       CreateTree::Instance()->h_phot_sci_det_angleAtProduction -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection))*57.2958 );
       CreateTree::Instance()->h_phot_sci_det_angleWithSurfNormal -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackDirection))*57.2958 );
+      //comment line below if standard SiPM
+//      CreateTree::Instance()->time_ext_scint.push_back(thePrePoint->GetGlobalTime()/picosecond );
       // if you do not want to kill a photon once it enters the detector, comment here below
       theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
@@ -273,6 +277,8 @@ void SteppingAction::UserSteppingAction (const G4Step * theStep)
       CreateTree::Instance()->h_phot_cer_det_time   -> Fill( thePrePoint->GetGlobalTime()/picosecond );
       CreateTree::Instance()->h_phot_cer_det_angleAtProduction -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackVertexDirection))*57.2958 );
       CreateTree::Instance()->h_phot_cer_det_angleWithSurfNormal -> Fill( (G4ThreeVector(0.,0.,1.).angle(theTrackDirection))*57.2958 );
+      //comment line below if standard SiPM
+//      CreateTree::Instance()->time_ext_cher.push_back(thePrePoint->GetGlobalTime()/picosecond );
 //    
       // if you do not want to kill a photon once it enters the detector, comment here below
       theTrack->SetTrackStatus(fKillTrackAndSecondaries);
