@@ -122,6 +122,7 @@ private:
   G4double cryst_dist;
   G4double abs_thick;
   G4int crystal_conf;
+  G4int diffuse_sipm;
   G4int ref_crys;
 
   G4float toy_ly;
