@@ -96,6 +96,7 @@ DetectorConstruction::DetectorConstruction (const string& configFileName)
   config.readInto(core_absLength,"core_absLength");
   
   config.readInto(crystal_conf,   "crystal_conf");
+  config.readInto(diffuse_sipm,   "diffuse_sipm");
   config.readInto(ref_crys,       "ref_crys");
   
   config.readInto(capillary_thickness,"capillary_thickness");
@@ -337,13 +338,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   
   if (crystal_conf == 0)	//aligned longitudinally
   {
-    new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV", worldLV, false, 0, checkOverlaps) ;
-    new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      "gapPV", worldLV, false, 0, checkOverlaps) ;
-    if (ref_crys == 1)
-    {
-      new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+0.5*depth + fibre_length),          gapLayerLV, "gapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+depth+0.5*(gap_l-depth) + fibre_length), gapLV,      "gapPV_ref", worldLV, false, 0, checkOverlaps) ;
-    }
+      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+0.5*depth ),          gapLayerLV, "gapLayerPV", worldLV, false, 0, checkOverlaps) ;
+      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      "gapPV", worldLV, false, 0, checkOverlaps) ;
+      if (ref_crys == 1)
+      {
+              new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+0.5*depth + fibre_length),          gapLayerLV, "gapLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+	      new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + .5*fibre_length+depth+0.5*(gap_l-depth) + fibre_length), gapLV,      "gapPV_ref", worldLV, false, 0, checkOverlaps) ;
+      }	
   }
   
   else if (crystal_conf == 1)	//side-to-side
@@ -364,13 +365,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   else if (crystal_conf > 2)	//multi SiPMs - 5 in one
   {
 	int   lines   = sqrt(crystal_conf);
-	float spacing = det_size_x;
+	float spacing = core_radius_x*2/lines;
 	float offset  = -core_radius_x; 
 	
 	for (int iDet = 0; iDet < crystal_conf; iDet++)
 	{
-	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing + det_size_x)*(iDet%lines +1), offset + (spacing + det_size_x)*(iDet/lines +1), 0.5*fibre_length+0.5*depth), gapLayerLV, Form("gapLayerPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
-	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing + det_size_x)*(iDet%lines +1), offset + (spacing + det_size_x)*(iDet/lines +1), 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      Form("gapPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
+	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing)*(iDet%lines +0.5), offset + (spacing)*(iDet/lines +0.5), 0.5*fibre_length+0.5*depth), gapLayerLV, Form("gapLayerPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
+	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing)*(iDet%lines +0.5), offset + (spacing)*(iDet/lines +0.5), 0.5*fibre_length+depth+0.5*(gap_l-depth)), gapLV,      Form("gapPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
 	}
   }
 
@@ -405,12 +406,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
   G4LogicalVolume * detLV      = NULL;
   if( detector )
   {
-    if (det_size_x == -1)
+   if (diffuse_sipm == 0)	//non diffuse SiPM
+   {
+    if (det_size_x == -1)	//set the SiPM active area equal to the crystal surface
     {
       detLayerS = new G4Box ("detLayerS", core_radius_x*mm, core_radius_y*mm, 0.5*depth) ;
       detS      = new G4Box (     "detS", core_radius_x*mm, core_radius_y*mm, 0.5*(det_l-depth)) ;
     }
-    else
+    else if (det_size_x > 0)
     {
       detLayerS = new G4Box ("detLayerS", det_size_x*0.5, det_size_y*0.5, 0.5*depth) ;
       detS      = new G4Box (     "detS", det_size_x*0.5, det_size_y*0.5, 0.5*(det_l-depth)) ;
@@ -422,13 +425,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
     //for standard conf
     if (crystal_conf == 0)
     {
-      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
-      if (ref_crys == 1)
-      {
-        new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+0.5*depth + fibre_length),          detLayerLV, "detLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
-        new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth) + fibre_length), detLV,      "detPV_ref", worldLV, false, 0, checkOverlaps) ;
-      }
+       new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
+       new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
+       if (ref_crys == 1)
+       {
+         new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+0.5*depth + fibre_length),          detLayerLV, "detLayerPV_ref", worldLV, false, 0, checkOverlaps) ;
+         new G4PVPlacement (0, G4ThreeVector (0., 0., cryst_dist + 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth) + fibre_length), detLV,      "detPV_ref", worldLV, false, 0, checkOverlaps) ;
+       }
     }
     else if (crystal_conf == 1)
     {
@@ -449,34 +452,38 @@ G4VPhysicalVolume* DetectorConstruction::Construct ()
    else if (crystal_conf > 2)	//multi SiPMs - 5 in one
    {
 	int   lines   = sqrt(crystal_conf);
-	float spacing = det_size_x;
-	float offset  = -core_radius_x; 
+	float spacing = core_radius_x*2/lines;
+	float offset  = -core_radius_x ; 
 	
 	for (int iDet = 0; iDet < crystal_conf; iDet++)
 	{
-	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing + det_size_x)*(iDet%lines +1), offset + (spacing + det_size_y)*(iDet/lines +1), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, Form("detLayerPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
-	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing + det_size_x)*(iDet%lines +1), offset + (spacing + det_size_y)*(iDet/lines +1), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      Form("detPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
+	  new G4PVPlacement (0, G4ThreeVector (offset + spacing*(iDet%lines +0.5), offset + spacing*(iDet/lines +0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, Form("detLayerPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
+	  new G4PVPlacement (0, G4ThreeVector (offset + spacing*(iDet%lines +0.5), offset + spacing*(iDet/lines +0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      Form("detPV_%d", iDet), worldLV, false, 0, checkOverlaps) ;
 	}
-/*
-	//central 
-      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement (0, G4ThreeVector (0., 0., 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV", worldLV, false, 0, checkOverlaps) ;
-	//corners 
-		//bot left
-      new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_1", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_1", worldLV, false, 0, checkOverlaps) ;
-		//bot right
-      new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_2", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), -(2+det_size*0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_2", worldLV, false, 0, checkOverlaps) ;
-		//top left
-      new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_3", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement (0, G4ThreeVector (-(2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_3", worldLV, false, 0, checkOverlaps) ;
-		//top right
-      new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, "detLayerPV_4", worldLV, false, 0, checkOverlaps) ;
-      new G4PVPlacement (0, G4ThreeVector ((2+det_size*0.5), (2+det_size*0.5), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      "detPV_4", worldLV, false, 0, checkOverlaps) ;
-*/
    }
   }
+  else if (diffuse_sipm == 1)	//negative size for the sipm active area in a diffuse SiPM
+  {
+      float cell_pitch   = 0.015;	//15 um baseline design
+      float active_area = 4*4;
+      int lines     = (int) sqrt(active_area)/cell_pitch -1.;
+      int NCELLS    = lines*lines ;
+      float spacing = core_radius_x*2 / lines;
+      float offset  = -core_radius_x;
+      std::cout << "cell_pitch = " << cell_pitch << " :: lines = " << lines  << " :: NCELLS = " << NCELLS << " :: spacing = " << spacing << " :: offset = " << offset << std::endl;
+
+      detLayerS = new G4Box ("detLayerS", cell_pitch *0.5, cell_pitch *0.5, 0.5*depth) ;
+      detS      = new G4Box (     "detS", cell_pitch *0.5, cell_pitch *0.5, 0.5*(det_l-depth)) ;
+      detLayerLV = new G4LogicalVolume (detLayerS, DeMaterial, "detLayerLV") ;
+      detLV      = new G4LogicalVolume (detS,      DeMaterial,      "detLV") ;
+
+      for (int iCell = 0; iCell < NCELLS; iCell++)
+      {
+	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing )*(iCell%lines +1), offset + (spacing )*(iCell/lines +1), 0.5*fibre_length+gap_l+0.5*depth),          detLayerLV, Form("detLayerPV_%d", iCell), worldLV, false, 0, checkOverlaps) ;
+	  new G4PVPlacement (0, G4ThreeVector (offset + (spacing )*(iCell%lines +1), offset + (spacing )*(iCell/lines +1), 0.5*fibre_length+gap_l+depth+0.5*(det_l-depth)), detLV,      Form("detPV_%d", iCell), worldLV, false, 0, checkOverlaps) ;
+      }
+  }
+ }
 
    //SURFACE STATE IMPLEMENTATION
 
